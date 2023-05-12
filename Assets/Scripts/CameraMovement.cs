@@ -7,6 +7,7 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] private float rotatingSpeed;
     [SerializeField] private GameObject cameraObject;
     [SerializeField] private float range;
+    [SerializeField] private bool rotatePlayerCharacter = true;
 
     // Start is called before the first frame update
     void Start()
@@ -22,57 +23,36 @@ public class CameraMovement : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
-        if (isAllowedToRotate(this.transform.right, mouseX, mouseY))
+        if (isAllowedToRotate(mouseX, mouseY))
         {
             Debug.Log("Is allowed to rotate");
+            newRot.y = mouseX * Time.deltaTime * rotatingSpeed;
+            newRot.x = mouseY * Time.deltaTime * rotatingSpeed;
 
-            return;
-        }
+            Vector3 newQuat1 = (this.transform.rotation).eulerAngles + newRot;
 
-
-
-        //this should be limited for against walls
-        if (mouseX > 0)
-        {
-            if (isAllowedToRotate(this.transform.right))
+            if (rotatePlayerCharacter)
             {
-                newRot.y = mouseX * Time.deltaTime * rotatingSpeed;
+                Vector3 newQuat2 = new Vector3(0, (this.transform.parent.transform.rotation).eulerAngles.y + newRot.y, 0);
+                this.transform.parent.transform.rotation = Quaternion.Euler(newQuat2);
+                this.transform.rotation = Quaternion.Euler(newQuat1);
             }
-        }
-        else if (mouseX < 0)
-        {
-            if (isAllowedToRotate(-this.transform.right))
+            else
             {
-                newRot.y = mouseX * Time.deltaTime * rotatingSpeed;
+                this.transform.rotation = Quaternion.Euler(newQuat1);
             }
+
         }
 
-        //this should be limited for against ground
 
-        if (mouseY > 0)
-        {
-            if (isAllowedToRotate(this.transform.up))
-            {
-                newRot.x = mouseY * Time.deltaTime * rotatingSpeed;
-            }
-        }
-        else if (mouseY < 0)
-        {
-            if (isAllowedToRotate(-this.transform.up))
-            {
-                newRot.x = mouseY * Time.deltaTime * rotatingSpeed;
-            }
-        }
-        //Debug.Log(newRot);
-        Vector3 newQuat = (this.transform.rotation).eulerAngles + newRot;
-        this.transform.rotation = Quaternion.Euler(newQuat);
     }
 
-    private bool isAllowedToRotate(Vector3 direction, float x = 0, float y = 0)
+
+    private bool isAllowedToRotate(float x = 0, float y = 0)
     {
 
         Vector3 dir1 = this.transform.up * y;
-        Vector3 dir2 = this.transform.right * x;
+        Vector3 dir2 = -this.transform.right * x;
         Vector3 finaldir = dir1 + dir2;
 
 
@@ -80,7 +60,6 @@ public class CameraMovement : MonoBehaviour
         {
             return false;
         }
-
 
         return true;
     }
