@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ProjectileHandler : MonoBehaviour
 {
-    private Sprite head;
+    private GameObject head;
     private float shootSpeed = 5;
     private float chargeTime = 0;
     private float damage = 1;
@@ -12,13 +12,34 @@ public class ProjectileHandler : MonoBehaviour
     private float size = 1;
     private Vector3 direction = new Vector3(0, 0, 0);
     private EquipmentDamage[] damageTypes;
+    private LayerMask layer;
 
-
+    private float slopeTreshhold = 1f;
 
     // Update is called once per frame
     void Update()
     {
-        this.gameObject.transform.position += direction.normalized * shootSpeed * Time.deltaTime;
+        Vector3 targetPos = gameObject.transform.position + gameObject.transform.forward * shootSpeed;
+        Vector3 raycastPos = gameObject.transform.position + gameObject.transform.forward;
+        raycastPos.y += slopeTreshhold;
+
+        RaycastHit hit;
+        //checks from a bit higher distance if there is ground nearby
+        if (Physics.Raycast(raycastPos, -Vector3.up, out hit, 4, layer))
+        {
+            //we now have the hit point, now we need to add the distance from ground to projectile.
+            float difference = targetPos.y - (hit.point.y + GameManager.projectileHeight);
+            if (Mathf.Abs(difference) < 0.05f)
+            {
+                targetPos.y -= Mathf.Clamp(difference + 12 / difference, -1.5f, 1.5f);
+            }
+
+        }
+
+        //this.gameObject.transform.position += gameObject.transform.forward * shootSpeed * Time.deltaTime;
+
+        this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPos, Time.deltaTime);
+        
         if (lifetime <= 0)
         {
             Destroy(gameObject);
@@ -29,7 +50,7 @@ public class ProjectileHandler : MonoBehaviour
         }
     }
 
-    public void SetupProject(EquipmentDamage[] damageTypes, S_Projectile projectileStats, Vector3 projectileDirection)
+    public void SetupProjectile(EquipmentDamage[] damageTypes, S_Projectile projectileStats, Vector3 projectileDirection)
     {
         this.damageTypes = damageTypes;
         head = projectileStats.head;
@@ -39,23 +60,27 @@ public class ProjectileHandler : MonoBehaviour
         lifetime = projectileStats.lifetime;
         size = projectileStats.size;
         direction = projectileDirection;
+        Debug.Log(projectileStats.groundLayer.value);
+        layer = projectileStats.groundLayer;
 
-        this.gameObject.AddComponent<SpriteRenderer>();
-        this.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 1;
-        this.gameObject.GetComponent<SpriteRenderer>().sprite = head;
-        this.gameObject.AddComponent<CircleCollider2D>();
         this.gameObject.transform.localScale = new Vector3(size, size, size);
 
     }
 
-    public void OnCollisionEnter2D(Collision2D collision)
+    public void OnCollisionEnter(Collision collision)
     {
-        Debug.LogWarning("TODO: Implement functionality for dealing damage to damageable entities, hitting: " + collision.gameObject.name);
+        
         if (collision.gameObject.tag == "Enemy")
         {
             collision.gameObject.GetComponent<Dummy>().DoDamage(damageTypes);
         }
-        Destroy(this.gameObject);
+        if (collision.gameObject.tag != "Player")
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+        Debug.LogWarning("TODO: Implement functionality for dealing damage to damageable entities, hitting: " + collision.gameObject.name);
+
     }
 
 }

@@ -17,10 +17,6 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), Expandable] private S_Projectile rangedAttack;
 
     [field: SerializeField] public bool hasUpgrades { get; set; }
-
-
-
-
     [field: SerializeField, HideIf("hasUpgrades")] public EquipmentDamage[] EquipmentDamageList { get; set; }
     [field: SerializeField, ShowIf("hasUpgrades")] public EquipmentUpgrades[] EquipmentUpgradesList { get; set; }
 
@@ -31,6 +27,7 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private float chargeTime = 0;
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private float lifetime = 5;
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private float projectileSize = 1;
+    [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private LayerMask groundLayer = 1;
 
     [SerializeField, ShowIf("weaponType", WeaponType.Melee), BoxGroup("Stats")] private float attackSpeed = 1;
     [SerializeField, ShowIf("weaponType", WeaponType.Melee), BoxGroup("Stats")] private float attackSize = 1;
@@ -53,6 +50,7 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
 
     private Vector3 playerPosition;
     private GameObject player;
+
 
 
     private void updateArtifacts()
@@ -101,6 +99,7 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
             rangedAttack.chargeTime = adj_chargeTime;
             rangedAttack.lifetime = adj_lifetime;
             rangedAttack.size = adj_projectileSize;
+            rangedAttack.groundLayer = groundLayer;
         }
     }
 
@@ -141,14 +140,40 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
     private void handleRangedAttack() 
     {
         Debug.Log("Handling ranged attack");
-        GameObject newProjectile = new GameObject();
-        newProjectile.transform.position = playerPosition;
+
+        //to which direction to we need to shoot the projectile?
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hitData;
+        Vector3 worldPosition = new Vector3(0,0,0);
+        if (Physics.Raycast(ray, out hitData))
+        {
+            worldPosition = hitData.point;
+        }
+        else
+        {
+            Debug.LogWarning("Mouse click was not on a valid target.");
+            return;
+        }
+
+        //if we get past the check if we hit a targetable object, we spawn the object and set the settings
+        GameObject newProjectile = Instantiate(rangedAttack.head);
+
+        //set the rotation
+        Vector3 mousePos = worldPosition;
+        mousePos.y = 0;
+        Vector3 playerPos = playerPosition;
+        playerPos.y = 0;
+        Quaternion lookRot = Quaternion.LookRotation(mousePos - playerPos);
+       
+
+        newProjectile.transform.rotation = lookRot;
+        newProjectile.transform.position = new Vector3(playerPosition.x, playerPosition.y + GameManager.projectileHeight, playerPosition.z);
+        //hard coded, might need to change, the distance of which it gets initialized from player (to avoid overlap collisions)
+        //might need to disable collisions of projectile for x ms, or not respond to player at all, or not respond to player for x ms
+        newProjectile.transform.position += newProjectile.transform.forward * 1;
         newProjectile.AddComponent<ProjectileHandler>();
 
-        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        worldPosition -= playerPosition;
-        worldPosition.z = 0;
-        newProjectile.GetComponent<ProjectileHandler>().SetupProject(adj_equipmentDamage, rangedAttack, worldPosition.normalized);
+        newProjectile.GetComponent<ProjectileHandler>().SetupProjectile(adj_equipmentDamage, rangedAttack, worldPosition.normalized);
     }
 
     public void UpgradeWeapon()

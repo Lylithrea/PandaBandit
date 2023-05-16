@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f49cd028a6edd274eaef0f6ab25a89dd, type: 3}
+  m_Name: TestProjectile
+  m_EditorClassIdentifier: 
+  head: {fileID: 8546196640542073881, guid: c528808afe9664a4cae2ab75c2a47521, type: 3}
+  shootSpeed: 5
+  chargeTime: 0
+  damage: 1
+  lifetime: 5
+  size: 1
+  direction: {x: 0, y: 0, z: 0}
