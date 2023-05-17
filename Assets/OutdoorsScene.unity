@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2159.1008, g: 2263.5608, b: 3287.1333, a: 1}
+  m_IndirectSpecularColor: {r: 2160.0598, g: 2264.467, b: 3287.9224, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -291,7 +291,7 @@ MonoBehaviour:
   weapon:
   - {fileID: 11400000, guid: 7b8ae19b6a5834e41a86f4dafc008a10, type: 2}
   - {fileID: 11400000, guid: 107b1e91efd00b64eb76d5e9445a22ab, type: 2}
-  weaponCount: 1
+  weaponCount: 0
   switchTimer: 0.25
 --- !u!1 &157207112
 GameObject:
