@@ -12,7 +12,13 @@ public class MeleeHandler : MonoBehaviour
     public void Setup(EquipmentDamage[] damageTypes)
     {
         this.damageTypes = damageTypes;
-        AnimationClip clip = this.GetComponent<Animator>().runtimeAnimatorController.animationClips[0];
+        Animator anim = this.GetComponent<Animator>();
+        if (anim == null)
+        {
+            anim = this.GetComponentInChildren<Animator>();
+        }
+        AnimationClip clip = anim.runtimeAnimatorController.animationClips[0];
+
         //remove previous created events
         RemoveEvents(clip);
         //add new event

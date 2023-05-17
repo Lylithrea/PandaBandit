@@ -125,8 +125,9 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
     private void handleMeleeAttack()
     {
         Debug.Log("Handling melee attack");
-        GameObject newCollider = Instantiate(meleeAttack.effect, player.transform);
+        GameObject newCollider = Instantiate(meleeAttack.effect);
         newCollider.transform.position = playerPosition;
+        newCollider.transform.rotation = GetMouseDirection();
         MeleeHandler handler =  newCollider.GetComponent<MeleeHandler>();
         if (handler == null)
         {
@@ -141,10 +142,13 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
     {
         Debug.Log("Handling ranged attack");
 
+        //if we get past the check if we hit a targetable object, we spawn the object and set the settings
+        GameObject newProjectile = Instantiate(rangedAttack.head);
+
         //to which direction to we need to shoot the projectile?
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hitData;
-        Vector3 worldPosition = new Vector3(0,0,0);
+        Vector3 worldPosition = new Vector3(0, 0, 0);
         if (Physics.Raycast(ray, out hitData))
         {
             worldPosition = hitData.point;
@@ -155,18 +159,7 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
             return;
         }
 
-        //if we get past the check if we hit a targetable object, we spawn the object and set the settings
-        GameObject newProjectile = Instantiate(rangedAttack.head);
-
-        //set the rotation
-        Vector3 mousePos = worldPosition;
-        mousePos.y = 0;
-        Vector3 playerPos = playerPosition;
-        playerPos.y = 0;
-        Quaternion lookRot = Quaternion.LookRotation(mousePos - playerPos);
-       
-
-        newProjectile.transform.rotation = lookRot;
+        newProjectile.transform.rotation = GetMouseDirection();
         newProjectile.transform.position = new Vector3(playerPosition.x, playerPosition.y + GameManager.projectileHeight, playerPosition.z);
         //hard coded, might need to change, the distance of which it gets initialized from player (to avoid overlap collisions)
         //might need to disable collisions of projectile for x ms, or not respond to player at all, or not respond to player for x ms
@@ -174,6 +167,34 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
         newProjectile.AddComponent<ProjectileHandler>();
 
         newProjectile.GetComponent<ProjectileHandler>().SetupProjectile(adj_equipmentDamage, rangedAttack, worldPosition.normalized);
+    }
+
+
+    private Quaternion GetMouseDirection()
+    {
+        //to which direction to we need to shoot the projectile?
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hitData;
+        Vector3 worldPosition = new Vector3(0, 0, 0);
+        if (Physics.Raycast(ray, out hitData))
+        {
+            worldPosition = hitData.point;
+        }
+        else
+        {
+            Debug.LogWarning("Mouse click was not on a valid target.");
+            return Quaternion.Euler(new Vector3(0,0,0));
+        }
+
+
+        //set the rotation
+        Vector3 mousePos = worldPosition;
+        mousePos.y = 0;
+        Vector3 playerPos = playerPosition;
+        playerPos.y = 0;
+        Quaternion lookRot = Quaternion.LookRotation(mousePos - playerPos);
+
+        return lookRot;
     }
 
     public void UpgradeWeapon()
