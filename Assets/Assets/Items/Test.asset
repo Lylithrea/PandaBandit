@@ -10,17 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aebe5b2303055f544ba574f4efcfaee6, type: 3}
-  m_Name: IW_MeleeAttack
+  m_Name: Test
   m_EditorClassIdentifier: 
-  <ItemName>k__BackingField: TestMelee
-  weaponType: 1
+  <ItemName>k__BackingField: 
+  weaponType: 0
   <itemIcon>k__BackingField: {fileID: 0}
-  meleeAttack: {fileID: 11400000, guid: f265e967d36aaee48968c4bc5c8feb08, type: 2}
+  meleeAttack: {fileID: 0}
   rangedAttack: {fileID: 0}
   <hasUpgrades>k__BackingField: 0
-  <EquipmentDamageList>k__BackingField:
-  - damageType: 0
-    amount: 0
+  <EquipmentDamageList>k__BackingField: []
   <EquipmentUpgradesList>k__BackingField: []
   shootSpeed: 5
   chargeTime: 0
