@@ -31,4 +31,5 @@ MonoBehaviour:
     m_Bits: 1
   attackSpeed: 1
   attackSize: 1
-  Artifacts: []
+  Artifacts:
+  - {fileID: 11400000, guid: 80806df5c604e3c47a4a32b9b883433e, type: 2}
