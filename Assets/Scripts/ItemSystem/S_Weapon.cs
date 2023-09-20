@@ -241,6 +241,7 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
         foreach (S_Artifact artifact in Artifacts)
         {
             Modifiers[] mods = artifact.GetModifiers();
+            if (mods == null) break;
             foreach (Modifiers mod in mods)
             {
                 switch (mod.modifier)

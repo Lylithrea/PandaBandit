@@ -8,16 +8,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float rotationSpeed;
 
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
     {
-        //TODO: Normalize movement, so that diagonal has same speed
         Vector3 newPos = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         newPos.Normalize();
 
