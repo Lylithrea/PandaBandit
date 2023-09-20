@@ -125,7 +125,7 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
     private void handleMeleeAttack()
     {
         Debug.Log("Handling melee attack");
-        GameObject newCollider = Instantiate(meleeAttack.effect);
+        GameObject newCollider = Instantiate(meleeAttack.effect, player.transform);
         newCollider.transform.position = playerPosition;
         newCollider.transform.rotation = GetMouseDirection();
         MeleeHandler handler =  newCollider.GetComponent<MeleeHandler>();

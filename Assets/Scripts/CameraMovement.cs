@@ -10,6 +10,7 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] private float maximumDistance = 15;
     [SerializeField] private float lookDistance = 5;
     private Vector3 startPosition;
+    private bool toggleCamera = false;
 
     private void Start()
     {
@@ -26,22 +27,28 @@ public class CameraMovement : MonoBehaviour
         transform.position = Vector3.Slerp(transform.position, newPos, Time.deltaTime * moveSpeed);
 
         //possible add a path, so that the zoomed in version becomes more 3D and less top down.
-
-        if (startPosition.y > minimumDistance + 1)
+        if (toggleCamera)
         {
-            if (Input.GetAxis("Mouse ScrollWheel") > 0)
+            if (startPosition.y > minimumDistance + 1)
             {
-                startPosition += transform.forward * 1;
+                if (Input.GetAxis("Mouse ScrollWheel") > 0)
+                {
+                    startPosition += transform.forward * 1;
+                }
+            }
+            if (startPosition.y < maximumDistance - 1)
+            {
+                if (Input.GetAxis("Mouse ScrollWheel") < 0)
+                {
+                    startPosition -= transform.forward * 1;
+                }
             }
         }
-        if (startPosition.y < maximumDistance - 1)
-        {
-            if (Input.GetAxis("Mouse ScrollWheel") < 0)
-            {
-                startPosition -= transform.forward * 1;
-            }
-        }
 
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            toggleCamera = !toggleCamera;
+        }
 
     }
 

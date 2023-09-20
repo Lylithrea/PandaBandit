@@ -60,7 +60,6 @@ public class ProjectileHandler : MonoBehaviour
         lifetime = projectileStats.lifetime;
         size = projectileStats.size;
         direction = projectileDirection;
-        Debug.Log(projectileStats.groundLayer.value);
         layer = projectileStats.groundLayer;
 
         this.gameObject.transform.localScale = new Vector3(size, size, size);
