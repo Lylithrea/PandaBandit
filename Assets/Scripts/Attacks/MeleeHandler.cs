@@ -40,12 +40,18 @@ public class MeleeHandler : MonoBehaviour
         }
     }
 
-    public void OnCollisionEnter2D(Collision2D collision)
+    public void OnCollisionEnter(Collision collision)
     {
         Debug.LogWarning("TODO: Implement functionality for dealing damage to damageable entities, hitting: " + collision.gameObject.name);
-        if (collision.gameObject.tag == "Enemy")
+        if (collision.gameObject.CompareTag("Attack"))
         {
-            collision.gameObject.GetComponent<Dummy>().DoDamage(damageTypes);
+            Debug.Log("Child hit something!");
+        }
+
+            if (collision.gameObject.tag == "Enemy")
+        {
+            Debug.Log("Hit enemy!");
+            //collision.gameObject.GetComponent<Dummy>().DoDamage(damageTypes);
         }
     }
 

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Test
   m_EditorClassIdentifier: 
   <ItemName>k__BackingField: 
-  weaponType: 0
+  weaponType: 2
   <itemIcon>k__BackingField: {fileID: 0}
   meleeAttack: {fileID: 0}
   rangedAttack: {fileID: 0}
