@@ -24,6 +24,7 @@ public class S_Artifact : ScriptableObject, I_Item
         }
         else
         {
+            Debug.Log("Getting modifiers " + artifactModifiersList.Length);
             return artifactModifiersList;
         }
     }
@@ -31,6 +32,7 @@ public class S_Artifact : ScriptableObject, I_Item
     private void OnValidate()
     {
         Debug.Log("Validating artifact...");
+        if (weaponScript == null) return;
         weaponScript.UpdateInternalStats();
     }
 

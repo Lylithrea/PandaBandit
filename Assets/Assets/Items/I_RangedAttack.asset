@@ -18,7 +18,11 @@ MonoBehaviour:
   meleeAttack: {fileID: 0}
   rangedAttack: {fileID: 11400000, guid: becc9eb08226ce547b6584612079de5e, type: 2}
   <hasUpgrades>k__BackingField: 0
-  <EquipmentDamageList>k__BackingField: []
+  <EquipmentDamageList>k__BackingField:
+  - damageType: 0
+    amount: 1
+  - damageType: 2
+    amount: 3
   <EquipmentUpgradesList>k__BackingField: []
   shootSpeed: 5
   chargeTime: 0
@@ -29,5 +33,4 @@ MonoBehaviour:
     m_Bits: 64
   attackSpeed: 1
   attackSize: 1
-  Artifacts:
-  - {fileID: 11400000, guid: 80806df5c604e3c47a4a32b9b883433e, type: 2}
+  Artifacts: []

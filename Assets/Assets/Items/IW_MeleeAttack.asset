@@ -20,7 +20,9 @@ MonoBehaviour:
   <hasUpgrades>k__BackingField: 0
   <EquipmentDamageList>k__BackingField:
   - damageType: 0
-    amount: 0
+    amount: 5
+  - damageType: 1
+    amount: 1
   <EquipmentUpgradesList>k__BackingField: []
   shootSpeed: 5
   chargeTime: 0
@@ -32,4 +34,4 @@ MonoBehaviour:
   attackSpeed: 1
   attackSize: 1
   Artifacts:
-  - {fileID: 11400000, guid: 80806df5c604e3c47a4a32b9b883433e, type: 2}
+  - {fileID: 11400000, guid: 1654f0a60a1748748a77a414e11e1b72, type: 2}

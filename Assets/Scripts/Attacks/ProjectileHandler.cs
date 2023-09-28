@@ -11,7 +11,7 @@ public class ProjectileHandler : MonoBehaviour
     private float lifetime = 5;
     private float size = 1;
     private Vector3 direction = new Vector3(0, 0, 0);
-    private EquipmentDamage[] damageTypes;
+    [SerializeField] private EquipmentDamage[] damageTypes;
     private LayerMask layer;
 
     private float slopeTreshhold = 1f;
@@ -66,12 +66,30 @@ public class ProjectileHandler : MonoBehaviour
 
     }
 
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            other.gameObject.GetComponent<Enemy>().receiveDamage(damageTypes);
+            Destroy(this.gameObject);
+            //collision.gameObject.GetComponent<Dummy>().DoDamage(damageTypes);
+            return;
+        }
+        if (other.gameObject.tag != "Player" && other.gameObject.tag != "Projectile")
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+        Debug.LogWarning("TODO: Implement functionality for dealing damage to damageable entities, hitting: " + other.gameObject.name);
+    }
+
     public void OnCollisionEnter(Collision collision)
     {
-        
+        Debug.Log("Hit collision");
         if (collision.gameObject.tag == "Enemy")
         {
-            collision.gameObject.GetComponent<Dummy>().DoDamage(damageTypes);
+
+            //collision.gameObject.GetComponent<Dummy>().DoDamage(damageTypes);
         }
         if (collision.gameObject.tag != "Player")
         {

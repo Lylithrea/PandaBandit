@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    protected string _Name;
-    protected int maxHealth;
-    protected int currentHealth;
-    protected MOVEMENTSTATE movingState;
+    [SerializeField] protected string _Name;
+    [SerializeField] protected int maxHealth;
+    [SerializeField] protected int currentHealth;
+    [SerializeField] protected MOVEMENTSTATE movingState;
+    [SerializeField] protected EquipmentDamage[] resitances;
 
     protected virtual void move()
     {
@@ -27,14 +28,15 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    protected virtual void receiveDamage(int damage)
+    public virtual void receiveDamage(EquipmentDamage[] damageTypes)
     {
-        Debug.Log(_Name + " took " + damage + " damage");
-        currentHealth -= damage;
-        if (currentHealth < 0)
+        foreach(EquipmentDamage damage in damageTypes)
         {
-            Debug.Log("Enemy died!");
+            Debug.LogWarning("TODO: Implement damage based on equipment");
+            Debug.Log(_Name + " took " + damage.amount + " " + damage.damageType + " damage");
+            currentHealth -= damage.amount;
         }
+
     }
 
     protected virtual void attack()

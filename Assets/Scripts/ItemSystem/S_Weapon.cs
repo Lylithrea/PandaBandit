@@ -1,6 +1,7 @@
 using NaughtyAttributes;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Item/Weapon")]
@@ -62,8 +63,26 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
         }
     }
 
+    private void validateArtifacts()
+    {
+        for (int i = Artifacts.Count - 1; i >= 0; i--)
+        {
+            if (Artifacts[i] == null)
+            {
+                Artifacts.RemoveAt(i);
+                i++;
+            }
+        }
+
+
+    }
+
     private void OnValidate()
     {
+        //remove artifacts that are null
+
+        validateArtifacts();
+
 
 
         Debug.Log("On validate!");
@@ -238,6 +257,7 @@ public class S_Weapon : ScriptableObject, I_Item, I_Equipment
     public void UpdateInternalStats()
     {
         ResetInternalStats();
+        //if (Artifacts == null || Artifacts.Count == 0) return;
         foreach (S_Artifact artifact in Artifacts)
         {
             Modifiers[] mods = artifact.GetModifiers();
