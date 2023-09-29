@@ -7,14 +7,14 @@ public class Dummy : MonoBehaviour
 {
     public TextMeshProUGUI textbox;
 
-    public EquipmentDamage[] resitances;
+    public EquipmentTypes[] resitances;
 
 
-    public void DoDamage(EquipmentDamage[] damage)
+    public void DoDamage(EquipmentTypes[] damage)
     {
         Debug.Log("Dealing damage to dummy!");
         textbox.text = "Damage dealt: \n";
-        foreach (EquipmentDamage damageType in damage)
+        foreach (EquipmentTypes damageType in damage)
         {
             textbox.text += "Damage type: " + damageType.damageType.ToString() + " - Original amount: " + damageType.amount + "\n";
             textbox.text += "Resitances : " + getResistances(damageType.damageType) + " - New value: " + (damageType.amount - damageType.amount * (getResistances(damageType.damageType)/ 100)) + "\n";

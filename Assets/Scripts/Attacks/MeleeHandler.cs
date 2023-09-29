@@ -7,9 +7,9 @@ using UnityEngine.EventSystems;
 public class MeleeHandler : MonoBehaviour
 {
 
-    EquipmentDamage[] damageTypes;
+    EquipmentTypes[] damageTypes;
 
-    public void Setup(EquipmentDamage[] damageTypes)
+    public void Setup(EquipmentTypes[] damageTypes)
     {
         this.damageTypes = damageTypes;
         Animator anim = this.GetComponent<Animator>();

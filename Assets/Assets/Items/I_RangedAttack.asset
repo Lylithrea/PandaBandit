@@ -12,18 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aebe5b2303055f544ba574f4efcfaee6, type: 3}
   m_Name: I_RangedAttack
   m_EditorClassIdentifier: 
-  <ItemName>k__BackingField: 
-  weaponType: 2
-  <itemIcon>k__BackingField: {fileID: 0}
-  meleeAttack: {fileID: 0}
-  rangedAttack: {fileID: 11400000, guid: becc9eb08226ce547b6584612079de5e, type: 2}
-  <hasUpgrades>k__BackingField: 0
-  <EquipmentDamageList>k__BackingField:
-  - damageType: 0
-    amount: 1
+  ItemName: 
+  ItemIcon: {fileID: 0}
+  EquipmentDamageList:
   - damageType: 2
     amount: 3
-  <EquipmentUpgradesList>k__BackingField: []
+  - damageType: 0
+    amount: 1
+  EquipmentUpgradesList: []
+  hasUpgrades: 0
+  Artifacts: []
+  weaponType: 2
+  meleeAttack: {fileID: 0}
+  rangedAttack: {fileID: 11400000, guid: becc9eb08226ce547b6584612079de5e, type: 2}
   shootSpeed: 5
   chargeTime: 0
   lifetime: 5
@@ -33,4 +34,3 @@ MonoBehaviour:
     m_Bits: 64
   attackSpeed: 1
   attackSize: 1
-  Artifacts: []

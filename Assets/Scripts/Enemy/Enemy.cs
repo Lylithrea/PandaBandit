@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] protected int maxHealth;
     [SerializeField] protected int currentHealth;
     [SerializeField] protected MOVEMENTSTATE movingState;
-    [SerializeField] protected EquipmentDamage[] resitances;
+    [SerializeField] protected EquipmentTypes[] resitances;
 
     protected virtual void move()
     {
@@ -28,9 +28,9 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public virtual void receiveDamage(EquipmentDamage[] damageTypes)
+    public virtual void receiveDamage(EquipmentTypes[] damageTypes)
     {
-        foreach(EquipmentDamage damage in damageTypes)
+        foreach(EquipmentTypes damage in damageTypes)
         {
             Debug.LogWarning("TODO: Implement damage based on equipment");
             Debug.Log(_Name + " took " + damage.amount + " " + damage.damageType + " damage");

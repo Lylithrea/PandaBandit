@@ -11,7 +11,7 @@ public class ProjectileHandler : MonoBehaviour
     private float lifetime = 5;
     private float size = 1;
     private Vector3 direction = new Vector3(0, 0, 0);
-    [SerializeField] private EquipmentDamage[] damageTypes;
+    [SerializeField] private EquipmentTypes[] damageTypes;
     private LayerMask layer;
 
     private float slopeTreshhold = 1f;
@@ -50,7 +50,7 @@ public class ProjectileHandler : MonoBehaviour
         }
     }
 
-    public void SetupProjectile(EquipmentDamage[] damageTypes, S_Projectile projectileStats, Vector3 projectileDirection)
+    public void SetupProjectile(EquipmentTypes[] damageTypes, S_Projectile projectileStats, Vector3 projectileDirection)
     {
         this.damageTypes = damageTypes;
         head = projectileStats.head;

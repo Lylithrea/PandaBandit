@@ -12,18 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aebe5b2303055f544ba574f4efcfaee6, type: 3}
   m_Name: IW_MeleeAttack
   m_EditorClassIdentifier: 
-  <ItemName>k__BackingField: TestMelee
-  weaponType: 1
-  <itemIcon>k__BackingField: {fileID: 0}
-  meleeAttack: {fileID: 11400000, guid: f265e967d36aaee48968c4bc5c8feb08, type: 2}
-  rangedAttack: {fileID: 0}
-  <hasUpgrades>k__BackingField: 0
-  <EquipmentDamageList>k__BackingField:
+  ItemName: 
+  ItemIcon: {fileID: 0}
+  EquipmentDamageList:
   - damageType: 0
     amount: 5
   - damageType: 1
     amount: 1
-  <EquipmentUpgradesList>k__BackingField: []
+  EquipmentUpgradesList: []
+  hasUpgrades: 0
+  Artifacts:
+  - {fileID: 11400000, guid: 1654f0a60a1748748a77a414e11e1b72, type: 2}
+  weaponType: 1
+  meleeAttack: {fileID: 11400000, guid: f265e967d36aaee48968c4bc5c8feb08, type: 2}
+  rangedAttack: {fileID: 0}
   shootSpeed: 5
   chargeTime: 0
   lifetime: 5
@@ -33,5 +35,3 @@ MonoBehaviour:
     m_Bits: 1
   attackSpeed: 1
   attackSize: 1
-  Artifacts:
-  - {fileID: 11400000, guid: 1654f0a60a1748748a77a414e11e1b72, type: 2}

@@ -4,12 +4,8 @@ using UnityEngine;
 using NaughtyAttributes;
 
 [CreateAssetMenu(menuName = "Item/Artifact")]
-public class S_Artifact : ScriptableObject, I_Item
+public class S_Artifact : SO_Equipment
 {
-    public string ItemName { get; set; }
-    [HideIf("hasUpgrades")] public Sprite itemIcon;
-    public bool hasUpgrades = false;
-    
     [HideIf("hasUpgrades")] public Modifiers[] artifactModifiersList;
     [ShowIf("hasUpgrades")] public ArtifactUpgrades[] artifactUpgradesList;
 
@@ -81,7 +77,7 @@ public class Modifiers
 {
     public ArtifactModifiers modifier;
     [AllowNesting, ShowIf("modifier", ArtifactModifiers.AttackSpeed)] public float attackSpeedModifier;
-    [AllowNesting, ShowIf("modifier", ArtifactModifiers.Damage)] public EquipmentDamage damageModifier;
+    [AllowNesting, ShowIf("modifier", ArtifactModifiers.Damage)] public EquipmentTypes damageModifier;
     [AllowNesting, ShowIf("modifier", ArtifactModifiers.Defense)] public float defenseModifier;
     [AllowNesting, ShowIf("modifier", ArtifactModifiers.Size)] public float sizeModifier;
     [AllowNesting, ShowIf("modifier", ArtifactModifiers.ChargeTime)] public float chargeTimeModifier;
