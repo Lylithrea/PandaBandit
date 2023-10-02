@@ -27,7 +27,7 @@ MonoBehaviour:
   rangedAttack: {fileID: 11400000, guid: becc9eb08226ce547b6584612079de5e, type: 2}
   shootSpeed: 5
   chargeTime: 0
-  lifetime: 5
+  lifetime: 4
   projectileSize: 1
   groundLayer:
     serializedVersion: 2

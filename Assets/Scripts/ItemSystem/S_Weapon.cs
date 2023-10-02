@@ -43,10 +43,12 @@ public class S_Weapon : SO_Equipment
 
 
 
-
+    /// <summary>
+    /// Updates values of weapons when someone changes the values
+    /// </summary>
     private void OnValidate()
     {
-
+        UpdateInternalStats();
         Debug.Log("On validate!");
         switch (weaponType)
         {
@@ -61,8 +63,11 @@ public class S_Weapon : SO_Equipment
                 break;
         }
 
-        UpdateInternalStats();
     }
+
+    /// <summary>
+    /// Updates the melee values to the adjusted values
+    /// </summary>
     private void updateMeleeStats()
     {
         if (meleeAttack != null)
@@ -72,6 +77,9 @@ public class S_Weapon : SO_Equipment
         }
     }
 
+    /// <summary>
+    /// Updates the projectile values to the adjusted values
+    /// </summary>
     private void updateProjectileStats()
     {
         if (rangedAttack != null)
@@ -85,9 +93,13 @@ public class S_Weapon : SO_Equipment
     }
 
 
-    public void Attack(GameObject player, Vector3 position)
+    /// <summary>
+    /// Calls the attack method of currently equipped weapon
+    /// </summary>
+    /// <param name="player">The player who uses the weapon</param>
+    public void Attack(GameObject player)
     {
-        playerPosition = position;
+        playerPosition = player.gameObject.transform.position;
         this.player = player;
         switch (weaponType)
         {
@@ -142,12 +154,10 @@ public class S_Weapon : SO_Equipment
 
         newProjectile.transform.rotation = GetMouseDirection();
         newProjectile.transform.position = new Vector3(playerPosition.x, playerPosition.y + GameManager.projectileHeight, playerPosition.z);
-        //hard coded, might need to change, the distance of which it gets initialized from player (to avoid overlap collisions)
-        //might need to disable collisions of projectile for x ms, or not respond to player at all, or not respond to player for x ms
+        //hard coded, might need to change, the distance of which it gets initialized from player, so it can be changed per attack
         newProjectile.transform.position += newProjectile.transform.forward * 1;
         newProjectile.AddComponent<ProjectileHandler>();
-
-        newProjectile.GetComponent<ProjectileHandler>().SetupProjectile(adj_equipmentDamage, rangedAttack, worldPosition.normalized);
+        newProjectile.GetComponent<ProjectileHandler>().SetupProjectile(adj_equipmentDamage, rangedAttack);
     }
 
 
@@ -178,9 +188,16 @@ public class S_Weapon : SO_Equipment
         return lookRot;
     }
 
+
+    /// <summary>
+    /// Resets the adjusted values to the original values and then changes them accordingly to the artifacts
+    /// </summary>
     public override void UpdateInternalStats()
     {
         base.UpdateInternalStats();
+
+        //reset them to normal values, then make adjustments based on artifacts
+        resetAdjustedValues();
 
         foreach (S_Artifact artifact in Artifacts)
         {
@@ -211,17 +228,19 @@ public class S_Weapon : SO_Equipment
             }
         }
 
+    }
 
-        /*
-            public void UpdateInternalStats()
-            {
-
-                //updateMeleeStats();
-                //updateProjectileStats();
-            }*/
-
-
-
+    /// <summary>
+    /// Reset adjusted variables back to the original values
+    /// </summary>
+    void resetAdjustedValues()
+    {
+        adj_attackSize = attackSize;
+        adj_chargeTime = chargeTime;
+        adj_attackSpeed = attackSpeed;
+        adj_lifetime = lifetime;
+        adj_projectileSize = projectileSize;
+        adj_ShootSpeed = shootSpeed;
     }
 }
 

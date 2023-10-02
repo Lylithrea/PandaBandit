@@ -7,10 +7,9 @@ public class ProjectileHandler : MonoBehaviour
     private GameObject head;
     private float shootSpeed = 5;
     private float chargeTime = 0;
-    private float damage = 1;
     private float lifetime = 5;
     private float size = 1;
-    private Vector3 direction = new Vector3(0, 0, 0);
+
     [SerializeField] private EquipmentTypes[] damageTypes;
     private LayerMask layer;
 
@@ -39,7 +38,7 @@ public class ProjectileHandler : MonoBehaviour
         //this.gameObject.transform.position += gameObject.transform.forward * shootSpeed * Time.deltaTime;
 
         this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPos, Time.deltaTime);
-        
+
         if (lifetime <= 0)
         {
             Destroy(gameObject);
@@ -50,16 +49,14 @@ public class ProjectileHandler : MonoBehaviour
         }
     }
 
-    public void SetupProjectile(EquipmentTypes[] damageTypes, S_Projectile projectileStats, Vector3 projectileDirection)
+    public void SetupProjectile(EquipmentTypes[] damageTypes, S_Projectile projectileStats)
     {
         this.damageTypes = damageTypes;
         head = projectileStats.head;
         shootSpeed = projectileStats.shootSpeed;
         chargeTime = projectileStats.chargeTime;
-        damage = projectileStats.damage;
         lifetime = projectileStats.lifetime;
         size = projectileStats.size;
-        direction = projectileDirection;
         layer = projectileStats.groundLayer;
 
         this.gameObject.transform.localScale = new Vector3(size, size, size);
@@ -83,21 +80,5 @@ public class ProjectileHandler : MonoBehaviour
         Debug.LogWarning("TODO: Implement functionality for dealing damage to damageable entities, hitting: " + other.gameObject.name);
     }
 
-    public void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("Hit collision");
-        if (collision.gameObject.tag == "Enemy")
-        {
-
-            //collision.gameObject.GetComponent<Dummy>().DoDamage(damageTypes);
-        }
-        if (collision.gameObject.tag != "Player")
-        {
-            Destroy(this.gameObject);
-            return;
-        }
-        Debug.LogWarning("TODO: Implement functionality for dealing damage to damageable entities, hitting: " + collision.gameObject.name);
-
-    }
 
 }

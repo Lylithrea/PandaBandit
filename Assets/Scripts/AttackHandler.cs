@@ -42,7 +42,7 @@ public class AttackHandler : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            weapon[weaponCount].Attack(this.gameObject, this.transform.position);
+            weapon[weaponCount].Attack(this.gameObject);
 
         }
     }
