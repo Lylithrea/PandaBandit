@@ -37,15 +37,7 @@ public class S_Artifact : SO_Equipment
         weaponScript = weapon;
     }
 
-    public void UpgradeArtifact()
-    {
-        artifactUpgradeTier++;
-        if (artifactUpgradeTier >= artifactUpgradesList.Length)
-        {
-            artifactUpgradeTier = artifactUpgradesList.Length - 1;
-        }
-    }
-    public void DowngradeArtifact()
+    public override void DowngradeEquipment()
     {
         artifactUpgradeTier--;
         if (artifactUpgradeTier < 0)
@@ -54,7 +46,17 @@ public class S_Artifact : SO_Equipment
         }
     }
 
-    public void ResetArtifact()
+    public override void UpgradeEquipement()
+    {
+
+        artifactUpgradeTier++;
+        if (artifactUpgradeTier >= artifactUpgradesList.Length)
+        {
+            artifactUpgradeTier = artifactUpgradesList.Length - 1;
+        }
+    }
+
+    public override void ResetEquipment()
     {
         artifactUpgradeTier = 0;
         Debug.LogWarning("Artifact reset is not fully implemented, and will only reset the upgrade tier.");
@@ -82,6 +84,7 @@ public class Modifiers
     [AllowNesting, ShowIf("modifier", ArtifactModifiers.Size)] public float sizeModifier;
     [AllowNesting, ShowIf("modifier", ArtifactModifiers.ChargeTime)] public float chargeTimeModifier;
     [AllowNesting, ShowIf("modifier", ArtifactModifiers.Lifetime)] public float lifetimeModifier;
+    [AllowNesting, ShowIf("modifier", ArtifactModifiers.Cooldown)] public float cooldownModifier;
 }
 
 public enum ArtifactModifiers
@@ -91,5 +94,6 @@ public enum ArtifactModifiers
     Defense,
     Size,
     ChargeTime,
-    Lifetime
+    Lifetime,
+    Cooldown
 }

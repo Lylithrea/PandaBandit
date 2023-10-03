@@ -9,8 +9,18 @@ public class MeleeHandler : MonoBehaviour
 
     EquipmentTypes[] damageTypes;
 
-    public void Setup(EquipmentTypes[] damageTypes)
+    /// <summary>
+    /// Sets up the melee attack with the values
+    /// TODO: Scale and attack speed based on percentages or something
+    /// </summary>
+    /// <param name="damageTypes"> The types of damage it will do when colliding with enemies </param>
+    /// <param name="playerPosition"> The player position, to according place the weapon </param>
+    /// <param name="rotation"> The rotation of which direction it should play at </param>
+    public void Setup(EquipmentTypes[] damageTypes, S_Melee meleeStats, Vector3 playerPosition, Quaternion rotation)
     {
+        this.transform.position = playerPosition;
+        this.transform.rotation = rotation;
+
         this.damageTypes = damageTypes;
         Animator anim = this.GetComponent<Animator>();
         if (anim == null)
@@ -27,6 +37,9 @@ public class MeleeHandler : MonoBehaviour
         evt.time = clip.length;
         evt.functionName = "EndOfAttack";
         clip.AddEvent(evt);
+
+        anim.speed = anim.speed * meleeStats.attackSpeed;
+        this.gameObject.transform.localScale = new Vector3(meleeStats.size, meleeStats.size, meleeStats.size);
     }
 
     public void RemoveEvents(AnimationClip clip)

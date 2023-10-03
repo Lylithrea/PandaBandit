@@ -49,8 +49,20 @@ public class ProjectileHandler : MonoBehaviour
         }
     }
 
-    public void SetupProjectile(EquipmentTypes[] damageTypes, S_Projectile projectileStats)
+
+    /// <summary>
+    /// Sets up the projectile with the correct data and direction
+    /// </summary>
+    /// <param name="damageTypes"> What types of damage it will do when collding with enemies </param>
+    /// <param name="projectileStats"> The stats of the projectile </param>
+    /// <param name="playerPosition"> The position of the player </param>
+    /// <param name="rotation"> The rotation of which the projectile should be in </param>
+    public void SetupProjectile(EquipmentTypes[] damageTypes, S_Projectile projectileStats, Vector3 playerPosition, Quaternion rotation)
     {
+        this.transform.rotation = rotation;
+        //hardcoded the distance from player right now, could be nice to put it open for each projectile
+        this.transform.position = playerPosition + this.transform.forward * 1;
+
         this.damageTypes = damageTypes;
         head = projectileStats.head;
         shootSpeed = projectileStats.shootSpeed;

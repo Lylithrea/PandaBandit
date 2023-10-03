@@ -2,6 +2,8 @@ using NaughtyAttributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Experimental;
+using UnityEditor.Experimental.GraphView;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Item/Weapon")]
@@ -25,6 +27,7 @@ public class S_Weapon : SO_Equipment
 
     [SerializeField, ShowIf("weaponType", WeaponType.Melee), BoxGroup("Stats")] private float attackSpeed = 1;
     [SerializeField, ShowIf("weaponType", WeaponType.Melee), BoxGroup("Stats")] private float attackSize = 1;
+    [SerializeField, HideIf("weaponType", WeaponType.None), BoxGroup("Stats")] private float cooldown = 1;
 
     private float adj_ShootSpeed;
     private float adj_chargeTime;
@@ -32,7 +35,10 @@ public class S_Weapon : SO_Equipment
     private float adj_projectileSize;
     private float adj_attackSpeed;
     private float adj_attackSize;
+    private float adj_cooldown;
 
+    //low value so that you can immediatly attack
+    private float lastAttackTime = -100;
 
 
 
@@ -41,7 +47,14 @@ public class S_Weapon : SO_Equipment
 
 
 
-
+    /// <summary>
+    /// Gets called everytime you start the application
+    /// </summary>
+    public void OnEnable()
+    {
+        //low value so you can immediatly attack
+        lastAttackTime = -100;
+    }
 
     /// <summary>
     /// Updates values of weapons when someone changes the values
@@ -99,38 +112,49 @@ public class S_Weapon : SO_Equipment
     /// <param name="player">The player who uses the weapon</param>
     public void Attack(GameObject player)
     {
-        playerPosition = player.gameObject.transform.position;
-        this.player = player;
-        switch (weaponType)
+        Debug.Log("cooldown: " + adj_cooldown + " last attacked on: " + lastAttackTime + " now is: " + Time.time);
+        if(adj_cooldown <= Time.time - lastAttackTime)
         {
-            case WeaponType.Melee:
-                handleMeleeAttack();
-                break;
-            case WeaponType.Ranged:
-                handleRangedAttack();
-                break;
-            default:
-                Debug.Log("No weapon attack implemented for this weapon type: " + weaponType);
-                break;
+            playerPosition = player.gameObject.transform.position;
+            this.player = player;
+            switch (weaponType)
+            {
+                case WeaponType.Melee:
+                    handleMeleeAttack();
+                    break;
+                case WeaponType.Ranged:
+                    handleRangedAttack();
+                    break;
+                default:
+                    Debug.Log("No weapon attack implemented for this weapon type: " + weaponType);
+                    break;
+            }
+            lastAttackTime = Time.time;
         }
     }
 
+
+    /// <summary>
+    /// Instantiates the melee attack of the weapon
+    /// </summary>
     private void handleMeleeAttack()
     {
         Debug.Log("Handling melee attack");
-        GameObject newCollider = Instantiate(meleeAttack.effect, player.transform);
-        newCollider.transform.position = playerPosition;
-        newCollider.transform.rotation = GetMouseDirection();
-        MeleeHandler handler = newCollider.GetComponent<MeleeHandler>();
+        GameObject newMelee = Instantiate(meleeAttack.effect, player.transform);
+
+        MeleeHandler handler = newMelee.GetComponent<MeleeHandler>();
         if (handler == null)
         {
-            newCollider.AddComponent<MeleeHandler>();
-            handler = newCollider.GetComponent<MeleeHandler>();
+            newMelee.AddComponent<MeleeHandler>();
+            handler = newMelee.GetComponent<MeleeHandler>();
         }
 
-        handler.Setup(adj_equipmentDamage);
+        handler.Setup(adj_equipmentDamage, meleeAttack, playerPosition, GetMouseDirection());
     }
 
+    /// <summary>
+    /// Instantiates the ranged attack of the weapon
+    /// </summary>
     private void handleRangedAttack()
     {
         Debug.Log("Handling ranged attack");
@@ -138,26 +162,13 @@ public class S_Weapon : SO_Equipment
         //if we get past the check if we hit a targetable object, we spawn the object and set the settings
         GameObject newProjectile = Instantiate(rangedAttack.head);
 
-        //to which direction to we need to shoot the projectile?
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitData;
-        Vector3 worldPosition = new Vector3(0, 0, 0);
-        if (Physics.Raycast(ray, out hitData))
+        ProjectileHandler projectileHandler = newProjectile.GetComponent<ProjectileHandler>();
+        if (projectileHandler == null)
         {
-            worldPosition = hitData.point;
+            newProjectile.AddComponent<ProjectileHandler>();
+            projectileHandler = newProjectile.GetComponent<ProjectileHandler>();
         }
-        else
-        {
-            Debug.LogWarning("Mouse click was not on a valid target.");
-            return;
-        }
-
-        newProjectile.transform.rotation = GetMouseDirection();
-        newProjectile.transform.position = new Vector3(playerPosition.x, playerPosition.y + GameManager.projectileHeight, playerPosition.z);
-        //hard coded, might need to change, the distance of which it gets initialized from player, so it can be changed per attack
-        newProjectile.transform.position += newProjectile.transform.forward * 1;
-        newProjectile.AddComponent<ProjectileHandler>();
-        newProjectile.GetComponent<ProjectileHandler>().SetupProjectile(adj_equipmentDamage, rangedAttack);
+        projectileHandler.SetupProjectile(adj_equipmentDamage, rangedAttack, playerPosition, GetMouseDirection());
     }
 
 
@@ -221,8 +232,14 @@ public class S_Weapon : SO_Equipment
                         adj_projectileSize += projectileSize * (mod.sizeModifier / 100);
                         adj_attackSize += attackSize * (mod.sizeModifier / 100);
                         break;
+                    case ArtifactModifiers.Cooldown:
+                        adj_cooldown -= cooldown * (mod.cooldownModifier / 100);
+                        break;
                     default:
-                        Debug.LogWarning("The artifact modifier " + mod.modifier + " is not implemented in weapons.");
+                        if (mod.modifier != ArtifactModifiers.Damage)
+                        {
+                            Debug.LogWarning("The artifact modifier " + mod.modifier + " is not implemented in weapons.");
+                        }
                         break;
                 }
             }
@@ -241,6 +258,7 @@ public class S_Weapon : SO_Equipment
         adj_lifetime = lifetime;
         adj_projectileSize = projectileSize;
         adj_ShootSpeed = shootSpeed;
+        adj_cooldown = cooldown;
     }
 }
 

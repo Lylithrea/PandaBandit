@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ItemName: 
   ItemIcon: {fileID: 0}
+  hasUpgrades: 1
   EquipmentDamageList:
   - damageType: 0
     amount: 5
   - damageType: 1
     amount: 1
   EquipmentUpgradesList: []
-  hasUpgrades: 0
   Artifacts:
   - {fileID: 11400000, guid: 1654f0a60a1748748a77a414e11e1b72, type: 2}
   weaponType: 1
@@ -35,3 +35,4 @@ MonoBehaviour:
     m_Bits: 1
   attackSpeed: 1
   attackSize: 1
+  cooldown: 0.5
