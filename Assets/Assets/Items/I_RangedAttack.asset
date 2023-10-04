@@ -34,4 +34,4 @@ MonoBehaviour:
     m_Bits: 64
   attackSpeed: 1
   attackSize: 1
-  cooldown: 3
+  cooldown: 0.15

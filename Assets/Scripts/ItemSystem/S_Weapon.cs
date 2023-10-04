@@ -112,7 +112,6 @@ public class S_Weapon : SO_Equipment
     /// <param name="player">The player who uses the weapon</param>
     public void Attack(GameObject player)
     {
-        Debug.Log("cooldown: " + adj_cooldown + " last attacked on: " + lastAttackTime + " now is: " + Time.time);
         if(adj_cooldown <= Time.time - lastAttackTime)
         {
             playerPosition = player.gameObject.transform.position;

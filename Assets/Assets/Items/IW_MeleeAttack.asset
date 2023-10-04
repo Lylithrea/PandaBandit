@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ItemName: 
   ItemIcon: {fileID: 0}
-  hasUpgrades: 1
+  hasUpgrades: 0
   EquipmentDamageList:
   - damageType: 0
     amount: 5
@@ -35,4 +35,4 @@ MonoBehaviour:
     m_Bits: 1
   attackSpeed: 1
   attackSize: 1
-  cooldown: 0.5
+  cooldown: 0.25
