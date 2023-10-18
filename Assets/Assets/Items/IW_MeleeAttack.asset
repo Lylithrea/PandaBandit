@@ -33,6 +33,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 1
-  attackSpeed: 1
+  attackSpeed: 2
   attackSize: 1
   cooldown: 0.25

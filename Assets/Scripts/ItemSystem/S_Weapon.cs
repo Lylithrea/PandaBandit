@@ -18,7 +18,6 @@ public class S_Weapon : SO_Equipment
 
 
     [Space]
-
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private float shootSpeed = 5;
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private float chargeTime = 0;
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private float lifetime = 5;
@@ -37,10 +36,8 @@ public class S_Weapon : SO_Equipment
     private float adj_attackSize;
     private float adj_cooldown;
 
-    //low value so that you can immediatly attack
+    //low value so that you can immediatly attack the first time
     private float lastAttackTime = -100;
-
-
 
     private Vector3 playerPosition;
     private GameObject player;
@@ -78,33 +75,7 @@ public class S_Weapon : SO_Equipment
 
     }
 
-    /// <summary>
-    /// Updates the melee values to the adjusted values
-    /// </summary>
-    private void updateMeleeStats()
-    {
-        if (meleeAttack != null)
-        {
-            meleeAttack.attackSpeed = adj_attackSpeed;
-            meleeAttack.size = adj_attackSize;
-        }
-    }
-
-    /// <summary>
-    /// Updates the projectile values to the adjusted values
-    /// </summary>
-    private void updateProjectileStats()
-    {
-        if (rangedAttack != null)
-        {
-            rangedAttack.shootSpeed = adj_ShootSpeed;
-            rangedAttack.chargeTime = adj_chargeTime;
-            rangedAttack.lifetime = adj_lifetime;
-            rangedAttack.size = adj_projectileSize;
-            rangedAttack.groundLayer = groundLayer;
-        }
-    }
-
+    #region Attack
 
     /// <summary>
     /// Calls the attack method of currently equipped weapon
@@ -157,7 +128,6 @@ public class S_Weapon : SO_Equipment
     private void handleRangedAttack()
     {
         Debug.Log("Handling ranged attack");
-
         //if we get past the check if we hit a targetable object, we spawn the object and set the settings
         GameObject newProjectile = Instantiate(rangedAttack.head);
 
@@ -170,34 +140,9 @@ public class S_Weapon : SO_Equipment
         projectileHandler.SetupProjectile(adj_equipmentDamage, rangedAttack, playerPosition, GetMouseDirection());
     }
 
+    #endregion
 
-    private Quaternion GetMouseDirection()
-    {
-        //to which direction to we need to shoot the projectile?
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitData;
-        Vector3 worldPosition = new Vector3(0, 0, 0);
-        if (Physics.Raycast(ray, out hitData))
-        {
-            worldPosition = hitData.point;
-        }
-        else
-        {
-            Debug.LogWarning("Mouse click was not on a valid target.");
-            return Quaternion.Euler(new Vector3(0, 0, 0));
-        }
-
-
-        //set the rotation
-        Vector3 mousePos = worldPosition;
-        mousePos.y = 0;
-        Vector3 playerPos = playerPosition;
-        playerPos.y = 0;
-        Quaternion lookRot = Quaternion.LookRotation(mousePos - playerPos);
-
-        return lookRot;
-    }
-
+    #region StatUpdaters
 
     /// <summary>
     /// Resets the adjusted values to the original values and then changes them accordingly to the artifacts
@@ -259,6 +204,62 @@ public class S_Weapon : SO_Equipment
         adj_ShootSpeed = shootSpeed;
         adj_cooldown = cooldown;
     }
+
+    /// <summary>
+    /// Updates the melee values to the adjusted values
+    /// </summary>
+    private void updateMeleeStats()
+    {
+        if (meleeAttack != null)
+        {
+            meleeAttack.attackSpeed = adj_attackSpeed;
+            meleeAttack.size = adj_attackSize;
+        }
+    }
+
+    /// <summary>
+    /// Updates the projectile values to the adjusted values
+    /// </summary>
+    private void updateProjectileStats()
+    {
+        if (rangedAttack != null)
+        {
+            rangedAttack.shootSpeed = adj_ShootSpeed;
+            rangedAttack.chargeTime = adj_chargeTime;
+            rangedAttack.lifetime = adj_lifetime;
+            rangedAttack.size = adj_projectileSize;
+            rangedAttack.groundLayer = groundLayer;
+        }
+    }
+    #endregion
+
+    #region Tooling
+    private Quaternion GetMouseDirection()
+    {
+        //to which direction to we need to shoot the projectile?
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hitData;
+        Vector3 worldPosition = new Vector3(0, 0, 0);
+        if (Physics.Raycast(ray, out hitData))
+        {
+            worldPosition = hitData.point;
+        }
+        else
+        {
+            Debug.LogWarning("Mouse click was not on a valid target.");
+            return Quaternion.Euler(new Vector3(0, 0, 0));
+        }
+
+        //set the rotation
+        Vector3 mousePos = worldPosition;
+        mousePos.y = 0;
+        Vector3 playerPos = playerPosition;
+        playerPos.y = 0;
+        Quaternion lookRot = Quaternion.LookRotation(mousePos - playerPos);
+
+        return lookRot;
+    }
+    #endregion
 }
 
 
