@@ -10,4 +10,10 @@ public class MainMenuManager : MonoBehaviour
         SceneSwitcher switcher = SceneSwitcher.Instance;
         switcher.loadSceneSingle(sceneName);
     }
+
+    public void updateSceneState(int state)
+    {
+        SceneSwitcher.Instance.SetState((SceneState)state);
+    }
+
 }

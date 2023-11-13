@@ -91,7 +91,7 @@ public class Enemy : MonoBehaviour
     {
         if (Vector3.Distance(player.transform.position, this.gameObject.transform.position) < aggressionRange)
         {
-            Debug.Log("Enemy spotted you!");
+            //Debug.Log("Enemy spotted you!");
             movingState = MOVEMENTSTATE.chasing;
         }
         move();

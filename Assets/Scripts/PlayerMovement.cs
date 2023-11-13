@@ -48,7 +48,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Mouse click was not on a valid target.");
+            //Debug.LogWarning("Mouse click was not on a valid target.");
             return Quaternion.Euler(new Vector3(0, 0, 0));
         }
 

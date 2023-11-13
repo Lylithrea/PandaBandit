@@ -22,6 +22,7 @@ public class MeleeHandler : MonoBehaviour
         this.transform.rotation = rotation;
 
         this.damageTypes = damageTypes;
+        Debug.Log("damage type: " + damageTypes[0].damageType);
         Animator anim = this.GetComponent<Animator>();
         if (anim == null)
         {

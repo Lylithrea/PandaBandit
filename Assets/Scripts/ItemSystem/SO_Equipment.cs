@@ -185,6 +185,10 @@ public class SO_Equipment : SO_Item
             //make new array based on the amount of damage types
             adj_equipmentDamage = new EquipmentTypes[EquipmentDamageList.Length];
             currentEquipmentDamage = new EquipmentTypes[EquipmentDamageList.Length];
+
+            Debug.Log("Equipment damage count: " + EquipmentDamageList.Length);
+            Debug.Log("Adjusting variables: " + EquipmentDamageList[0].damageType + " with value: " + EquipmentDamageList[0].amount);
+
             //loop through all the types and update the values of both adjusted and current values
             for (int i = 0; i < adj_equipmentDamage.Length; i++)
             {

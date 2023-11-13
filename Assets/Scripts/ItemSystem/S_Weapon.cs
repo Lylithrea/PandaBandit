@@ -1,9 +1,4 @@
 using NaughtyAttributes;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.Rendering;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Item/Weapon")]
@@ -51,6 +46,7 @@ public class S_Weapon : SO_Equipment
     {
         //low value so you can immediatly attack
         lastAttackTime = -100;
+        UpdateInternalStats();
     }
 
     /// <summary>
@@ -118,7 +114,7 @@ public class S_Weapon : SO_Equipment
             newMelee.AddComponent<MeleeHandler>();
             handler = newMelee.GetComponent<MeleeHandler>();
         }
-
+        Debug.Log("Calling setup now with adj type: " + adj_equipmentDamage[0].damageType);
         handler.Setup(adj_equipmentDamage, meleeAttack, playerPosition, GetMouseDirection());
     }
 
