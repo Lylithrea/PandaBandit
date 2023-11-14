@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{6044bd02-2a8e-482b-9e9d-2bda3740fe0b}">
+		<property name="assetPath">
+			<value>161628__crazyfrog249__blop.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>0.08126984126984127</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{dcdd955d-60e5-4ef3-8040-f3779abf2b3e}</destination>
+		</relationship>
+	</object>
+</objects>
