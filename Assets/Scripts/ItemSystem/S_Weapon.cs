@@ -17,6 +17,7 @@ public class S_Weapon : SO_Equipment
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private float chargeTime = 0;
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private float lifetime = 5;
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private float projectileSize = 1;
+    [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private float piercing = 1; //how many enemies it can hit
     [SerializeField, ShowIf("weaponType", WeaponType.Ranged), BoxGroup("Stats")] private LayerMask groundLayer = 1;
 
     [SerializeField, ShowIf("weaponType", WeaponType.Melee), BoxGroup("Stats")] private float attackSpeed = 1;
@@ -225,6 +226,7 @@ public class S_Weapon : SO_Equipment
             rangedAttack.lifetime = adj_lifetime;
             rangedAttack.size = adj_projectileSize;
             rangedAttack.groundLayer = groundLayer;
+            rangedAttack.piercing = piercing;
         }
     }
     #endregion

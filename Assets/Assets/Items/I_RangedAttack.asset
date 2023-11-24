@@ -29,6 +29,7 @@ MonoBehaviour:
   chargeTime: 0
   lifetime: 4
   projectileSize: 1
+  piercing: 3
   groundLayer:
     serializedVersion: 2
     m_Bits: 64

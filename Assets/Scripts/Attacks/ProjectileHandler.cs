@@ -9,6 +9,7 @@ public class ProjectileHandler : MonoBehaviour
     private float chargeTime = 0;
     private float lifetime = 5;
     private float size = 1;
+    private float piercing = 1;
 
     [SerializeField] private EquipmentTypes[] damageTypes;
     private LayerMask layer;
@@ -70,18 +71,34 @@ public class ProjectileHandler : MonoBehaviour
         lifetime = projectileStats.lifetime;
         size = projectileStats.size;
         layer = projectileStats.groundLayer;
+        piercing = projectileStats.piercing;
 
         this.gameObject.transform.localScale = new Vector3(size, size, size);
 
     }
 
+
+    public GameObject lastHitEnemy = null;
+
     public void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Enemy")
         {
-            other.gameObject.GetComponent<Enemy>().receiveDamage(damageTypes);
-            Destroy(this.gameObject);
-            //collision.gameObject.GetComponent<Dummy>().DoDamage(damageTypes);
+            GameObject hitEnemy = other.gameObject;
+            if (lastHitEnemy == null || hitEnemy != lastHitEnemy)
+            {
+                lastHitEnemy = hitEnemy;
+
+                other.gameObject.GetComponent<Enemy>().receiveDamage(damageTypes);
+                //maybe decrease it based on enemy resistance? (bosses or enemies that cannot be pierced?)
+                piercing--;
+                if (piercing <= 0)
+                {
+                    Destroy(this.gameObject);
+                }
+                //collision.gameObject.GetComponent<Dummy>().DoDamage(damageTypes);
+            }
+
             return;
         }
         if (other.gameObject.tag != "Player" && other.gameObject.tag != "Projectile")
