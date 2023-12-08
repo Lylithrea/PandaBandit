@@ -27,7 +27,11 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         this.item = item;
         this.amount = amount;
         currentSlot = slot;
-        GetComponent<Image>().sprite = item.ItemIcon;
+        if (item != null)
+        {
+            GetComponent<Image>().sprite = item.ItemIcon;
+        }
+
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -95,31 +99,34 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                     this.transform.SetParent(newSlot.gameObject.transform);
                     this.gameObject.transform.position = currentPosition;
                 }*/
-
-        if (newSlot.item == null)
+        if (newSlot.variant == item.variant || newSlot.variant == ItemVariant.None)
         {
-            currentSlot.RemoveItem();
-            newSlot.SetItem(item, amount);
-        }
-        else if (newSlot.item == item)
-        {
-            int maxMoveCount = newSlot.item.maxStackSize - newSlot.currentAmount;
-            int leftover = maxMoveCount - amount;
-            if (leftover < 0)
+            if (newSlot.item == null)
             {
-                //we have to many we wanna move
-                currentSlot.RemoveItemAmount(amount - maxMoveCount);
-                newSlot.AddItem(item, maxMoveCount);
-            }
-            else
-            {
-                //we can move everything
-                newSlot.AddItem(item, amount);
                 currentSlot.RemoveItem();
-                item = null;
+                newSlot.SetItem(item, amount);
             }
+            else if (newSlot.item == item)
+            {
+                int maxMoveCount = newSlot.item.maxStackSize - newSlot.currentAmount;
+                int leftover = maxMoveCount - amount;
+                if (leftover < 0)
+                {
+                    //we have to many we wanna move
+                    currentSlot.RemoveItemAmount(amount - maxMoveCount);
+                    newSlot.AddItem(item, maxMoveCount);
+                }
+                else
+                {
+                    //we can move everything
+                    newSlot.AddItem(item, amount);
+                    currentSlot.RemoveItem();
+                    item = null;
+                }
 
+            }
         }
+
 
         //always put image back to original slot
         this.transform.SetParent(currentSlot.gameObject.transform);
