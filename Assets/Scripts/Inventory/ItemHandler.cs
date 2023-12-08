@@ -13,7 +13,7 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     private SlotManager currentSlot;
     private Vector3 currentPosition;
     InventoryManager inventoryManager;
-
+    GameObject dragItem;
     public void Start()
     {
         if (item != null)
@@ -37,16 +37,23 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     public void OnBeginDrag(PointerEventData eventData)
     {
         Debug.Log("Started dragging");
+        
+        
         currentSlot = this.gameObject.transform.parent.GetComponent<SlotManager>();
         currentPosition = this.gameObject.transform.position;
-        this.transform.SetParent(InventoryManager.Instance.inventoryDragParent.transform);
+        item = currentSlot.item;
+        amount = currentSlot.currentAmount;
         
+        dragItem = Instantiate(this.gameObject);
+        dragItem.transform.SetParent(InventoryManager.Instance.inventoryDragParent.transform);
+        //currentSlot.RemoveItem();
+        dragItem.SetActive(true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         Debug.Log("Dragging");
-        this.transform.position = Input.mousePosition;
+        dragItem.transform.position = Input.mousePosition;
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -82,55 +89,92 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
         else
         {
-            this.transform.SetParent(currentSlot.gameObject.transform);
-            this.gameObject.transform.position = currentPosition;
+            //dragItem.transform.SetParent(currentSlot.gameObject.transform);
+            //dragItem.gameObject.transform.position = currentPosition;
+            Destroy(dragItem.gameObject);
         }
 
     }
 
     private void HandleNewSlot(SlotManager newSlot)
     {
-        //if this returns true, it was possible to move all items to the new slot
-        //if it returns false, it either couldnt move anything at all or only a part
-        /*        if (newSlot.TryToAddItem(item, currentSlot.currentAmount))
-                {
-                    currentSlot.RemoveItem(item, currentSlot.currentAmount);
-                    currentSlot = newSlot;
-                    this.transform.SetParent(newSlot.gameObject.transform);
-                    this.gameObject.transform.position = currentPosition;
-                }*/
+        if (newSlot == currentSlot)
+        {
+            //currentSlot.AddItem()
+            //Destroy(dragItem.gameObject);
+            //return;
+        }
+        //see if we can move the item at all, if not we dont do anything
         if (newSlot.variant == item.variant || newSlot.variant == ItemVariant.None)
         {
+            //see if the slot is null, if so just simply move it in there
             if (newSlot.item == null)
             {
-                currentSlot.RemoveItem();
+                Debug.Log("New slot is empty so we can move it!");
+                //currentSlot.RemoveItemAmount(amount);
                 newSlot.SetItem(item, amount);
             }
+            //if the new slot is the same item, stack it up, any left overs stay in the original slot
             else if (newSlot.item == item)
             {
                 int maxMoveCount = newSlot.item.maxStackSize - newSlot.currentAmount;
                 int leftover = maxMoveCount - amount;
+                Debug.Log("The new slot is the same item");
+                //if leftover is lower, we have too much items to move
                 if (leftover < 0)
                 {
+                    Debug.Log("We have too many items to move, but we full stack the new slot");
                     //we have to many we wanna move
-                    currentSlot.RemoveItemAmount(amount - maxMoveCount);
+                    //currentSlot.RemoveItemAmount(amount - maxMoveCount);
                     newSlot.AddItem(item, maxMoveCount);
                 }
                 else
                 {
+                    Debug.Log("We have less than max stack amount of items, moving everything");
                     //we can move everything
                     newSlot.AddItem(item, amount);
-                    currentSlot.RemoveItem();
-                    item = null;
+                    //currentSlot.RemoveItem();
+                    //item = null;
+                }
+
+            }
+            else
+            {
+                //we need to move the full slot amount if we wanna switch
+                if (amount == currentSlot.currentAmount) 
+                {
+                    //can the new slot item go into our current slot?
+                    if (newSlot.item.variant == currentSlot.variant || currentSlot.variant == ItemVariant.None)
+                    { 
+                        
+                        //if we got here we can swap them
+                        Debug.Log("We can swap the items!");
+                        SO_Item swapItem = newSlot.item;
+                        int swapAmount = newSlot.currentAmount;
+
+                        newSlot.RemoveItem();
+                        newSlot.AddItem(item, amount);
+
+                        //currentSlot.RemoveItem();
+                        currentSlot.AddItem(swapItem, swapAmount);
+                    }
+                    else
+                    {
+                        Debug.Log("The item we want to swap does not adhere to our slot variant");
+                    }
+                }
+                else
+                {
+                    Debug.Log("We didnt move all items");
                 }
 
             }
         }
 
-
+        Destroy(dragItem.gameObject);
         //always put image back to original slot
-        this.transform.SetParent(currentSlot.gameObject.transform);
-        this.gameObject.transform.position = currentPosition;
+        //this.transform.SetParent(currentSlot.gameObject.transform);
+        //this.gameObject.transform.position = currentPosition;
     }
 
 }
