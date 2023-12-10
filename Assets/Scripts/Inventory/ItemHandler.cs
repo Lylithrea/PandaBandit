@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -13,7 +14,7 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     private SlotManager currentSlot;
     private Vector3 currentPosition;
     InventoryManager inventoryManager;
-    GameObject dragItem;
+    GameObject slotItem;
     public void Start()
     {
         if (item != null)
@@ -41,19 +42,25 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         
         currentSlot = this.gameObject.transform.parent.GetComponent<SlotManager>();
         currentPosition = this.gameObject.transform.position;
+        
+        
+        slotItem = Instantiate(this.gameObject);
+        slotItem.transform.position = currentPosition;
+        slotItem.transform.SetParent(InventoryManager.Instance.inventoryDragParent.transform);
+
+
+        //handle different inputs
         item = currentSlot.item;
         amount = currentSlot.currentAmount;
-        
-        dragItem = Instantiate(this.gameObject);
-        dragItem.transform.SetParent(InventoryManager.Instance.inventoryDragParent.transform);
-        //currentSlot.RemoveItem();
-        dragItem.SetActive(true);
+
+        slotItem.SetActive(false);
+
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         Debug.Log("Dragging");
-        dragItem.transform.position = Input.mousePosition;
+        this.transform.position = Input.mousePosition;
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -89,9 +96,9 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
         else
         {
-            //dragItem.transform.SetParent(currentSlot.gameObject.transform);
-            //dragItem.gameObject.transform.position = currentPosition;
-            Destroy(dragItem.gameObject);
+            this.transform.SetParent(currentSlot.gameObject.transform);
+            this.gameObject.transform.position = currentPosition;
+            Destroy(slotItem.gameObject);
         }
 
     }
@@ -101,8 +108,8 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         if (newSlot == currentSlot)
         {
             //currentSlot.AddItem()
-            //Destroy(dragItem.gameObject);
-            //return;
+            Destroy(slotItem.gameObject);
+            return;
         }
         //see if we can move the item at all, if not we dont do anything
         if (newSlot.variant == item.variant || newSlot.variant == ItemVariant.None)
@@ -111,7 +118,7 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             if (newSlot.item == null)
             {
                 Debug.Log("New slot is empty so we can move it!");
-                //currentSlot.RemoveItemAmount(amount);
+                currentSlot.RemoveItemAmount(amount);
                 newSlot.SetItem(item, amount);
             }
             //if the new slot is the same item, stack it up, any left overs stay in the original slot
@@ -125,7 +132,7 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                 {
                     Debug.Log("We have too many items to move, but we full stack the new slot");
                     //we have to many we wanna move
-                    //currentSlot.RemoveItemAmount(amount - maxMoveCount);
+                    currentSlot.RemoveItemAmount(amount - maxMoveCount);
                     newSlot.AddItem(item, maxMoveCount);
                 }
                 else
@@ -133,8 +140,7 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                     Debug.Log("We have less than max stack amount of items, moving everything");
                     //we can move everything
                     newSlot.AddItem(item, amount);
-                    //currentSlot.RemoveItem();
-                    //item = null;
+                    currentSlot.RemoveItem();
                 }
 
             }
@@ -155,7 +161,7 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                         newSlot.RemoveItem();
                         newSlot.AddItem(item, amount);
 
-                        //currentSlot.RemoveItem();
+                        currentSlot.RemoveItem();
                         currentSlot.AddItem(swapItem, swapAmount);
                     }
                     else
@@ -171,10 +177,17 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             }
         }
 
-        Destroy(dragItem.gameObject);
+        Destroy(slotItem.gameObject);
         //always put image back to original slot
-        //this.transform.SetParent(currentSlot.gameObject.transform);
-        //this.gameObject.transform.position = currentPosition;
+        this.transform.SetParent(currentSlot.gameObject.transform);
+        this.gameObject.transform.position = currentPosition;
     }
+
+    private void updateTempItem(SO_Item item, int amount)
+    {
+        slotItem.GetComponent<Image>().sprite = item.ItemIcon;
+        slotItem.GetComponentInChildren<TextMeshProUGUI>().text = amount.ToString();
+    }
+
 
 }
