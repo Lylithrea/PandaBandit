@@ -53,14 +53,16 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         item = currentSlot.item;
         amount = currentSlot.currentAmount;
 
-        slotItem.SetActive(false);
+        currentSlot.RemoveItem();
+        //slotItem.SetActive(false);
 
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         Debug.Log("Dragging");
-        this.transform.position = Input.mousePosition;
+        //this.transform.position = Input.mousePosition;
+        slotItem.transform.position = Input.mousePosition;
     }
 
     public void OnEndDrag(PointerEventData eventData)
