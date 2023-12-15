@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SlotManager : MonoBehaviour
+public class SlotManager : MonoBehaviour, IPointerClickHandler
 {
 
     public ItemVariant variant;
@@ -68,6 +69,7 @@ public class SlotManager : MonoBehaviour
 
     private void updateUI()
     {
+
         if (item == null || currentAmount == 0)
         {
             amountText.text = "";
@@ -89,6 +91,10 @@ public class SlotManager : MonoBehaviour
         }
     }
 
-
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Debug.Log("User clicked on a slot!");
+        InventoryManager.Instance.HandleClick(this);
+    }
 }
 

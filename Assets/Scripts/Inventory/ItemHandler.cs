@@ -5,104 +5,32 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class ItemHandler : MonoBehaviour
 {
 
     public SO_Item item;
     public int amount;
 
+    public Image itemIcon;
+    public TextMeshProUGUI itemAmount;
+
     private SlotManager currentSlot;
     private Vector3 currentPosition;
-    InventoryManager inventoryManager;
+
     GameObject slotItem;
-    public void Start()
+
+    public void UpdateUI()
     {
-        if (item != null)
-        {
-            GetComponent<Image>().sprite = item.ItemIcon;
-        }
+        itemIcon.sprite = item.ItemIcon;
+
+        itemAmount.text = amount.ToString();
+        if (item.maxStackSize == 1) itemAmount.text = "";
     }
 
-    public void Setup(SO_Item item, int amount, SlotManager slot)
+    public void SetItem(SO_Item item, int amount)
     {
         this.item = item;
         this.amount = amount;
-        currentSlot = slot;
-        if (item != null)
-        {
-            GetComponent<Image>().sprite = item.ItemIcon;
-        }
-
-    }
-
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        Debug.Log("Started dragging");
-        
-        
-        currentSlot = this.gameObject.transform.parent.GetComponent<SlotManager>();
-        currentPosition = this.gameObject.transform.position;
-        
-        
-        slotItem = Instantiate(this.gameObject);
-        slotItem.transform.position = currentPosition;
-        slotItem.transform.SetParent(InventoryManager.Instance.inventoryDragParent.transform);
-
-
-        //handle different inputs
-        item = currentSlot.item;
-        amount = currentSlot.currentAmount;
-
-        currentSlot.RemoveItem();
-        //slotItem.SetActive(false);
-
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        Debug.Log("Dragging");
-        //this.transform.position = Input.mousePosition;
-        slotItem.transform.position = Input.mousePosition;
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        Debug.Log("Ended dragging");
-        CheckForNewSlot();
-    }
-
-    private void CheckForNewSlot()
-    {
-        GraphicRaycaster raycaster = InventoryManager.Instance.raycaster;
-        PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
-        pointerEventData.position = Input.mousePosition;
-
-        List<RaycastResult> results = new List<RaycastResult>();
-        raycaster.Raycast(pointerEventData, results);
-
-        List<GameObject> uiElements = new List<GameObject>();
-
-        foreach (var result in results)
-        {
-            // Filter for specific script (CustomScriptName)
-            SlotManager customScript = result.gameObject.GetComponent<SlotManager>();
-            if (customScript != null)
-            {
-                uiElements.Add(result.gameObject);
-            }
-        }
-
-        if (uiElements.Count > 0)
-        {
-            HandleNewSlot(uiElements[0].GetComponent<SlotManager>());
-        }
-        else
-        {
-            this.transform.SetParent(currentSlot.gameObject.transform);
-            this.gameObject.transform.position = currentPosition;
-            Destroy(slotItem.gameObject);
-        }
-
     }
 
     private void HandleNewSlot(SlotManager newSlot)
@@ -185,11 +113,6 @@ public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         this.gameObject.transform.position = currentPosition;
     }
 
-    private void updateTempItem(SO_Item item, int amount)
-    {
-        slotItem.GetComponent<Image>().sprite = item.ItemIcon;
-        slotItem.GetComponentInChildren<TextMeshProUGUI>().text = amount.ToString();
-    }
 
 
 }
