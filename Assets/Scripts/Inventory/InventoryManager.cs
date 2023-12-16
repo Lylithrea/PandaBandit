@@ -1,9 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+
+[Serializable]
+public class InventoryItem
+{
+    public SO_Item item;
+    public int amount;
+}
 
 public class InventoryManager : MonoBehaviour
 {
@@ -13,10 +21,11 @@ public class InventoryManager : MonoBehaviour
     public GraphicRaycaster raycaster;
     public GameObject draggableItem;
 
-    public List<InventoryLayout> layouts = new List<InventoryLayout>();
+    public List<GameObject> layouts = new List<GameObject>();
+    public int currentInventoryLayout = 0;
 
-    private List<SlotManager> inventorySlots = new List<SlotManager>();
-    private List<SlotManager> equipmentSlots = new List<SlotManager>();
+    private Dictionary<SlotManager, InventoryItem> inventorySlots = new Dictionary<SlotManager, InventoryItem>();
+    private Dictionary<SlotManager, InventoryItem> equipmentSlots = new Dictionary<SlotManager, InventoryItem>();
 
     SlotManager currentSlot = null;
     SO_Item currentItem = null;
@@ -38,8 +47,6 @@ public class InventoryManager : MonoBehaviour
             return instance;
         }
     }
-
-
 
 
     public void Update()
