@@ -20,7 +20,7 @@ public class SlotManager : MonoBehaviour, IPointerClickHandler
     public void Start()
     {
         //itemObject.GetComponent<ItemHandler>().Setup(item, currentAmount, this);
-        updateUI();
+        //updateUI();
     }
 
     public void RemoveItem(SO_Item newItem, int amount)
@@ -67,8 +67,35 @@ public class SlotManager : MonoBehaviour, IPointerClickHandler
         updateUI();
     }
 
-    private void updateUI()
+    public void updateUI()
     {
+        InventoryItem inventoryItem = InventoryManager.Instance.GetItemFromSlot(this);
+        if(inventoryItem != null)
+        {
+            Debug.Log("Found item : " + inventoryItem.item.ItemName + " with amount: " + inventoryItem.amount);
+            if (inventoryItem.amount == 0)
+            {
+                amountText.text = "";
+                itemObject.SetActive(false);
+                return;
+            }
+
+            itemObject.SetActive(true);
+            itemObject.GetComponent<Image>().sprite = inventoryItem.item.ItemIcon;
+            if (inventoryItem.item.maxStackSize == 1)
+            {
+                amountText.text = "";
+            }
+            else
+            {
+                amountText.text = inventoryItem.amount.ToString();
+            }
+            return;
+        }
+        amountText.text = "";
+        itemObject.SetActive(false);
+        Debug.Log("No item was found");
+        return;
 
         if (item == null || currentAmount == 0)
         {

@@ -27,10 +27,10 @@ public class ItemHandler : MonoBehaviour
         if (item.maxStackSize == 1) itemAmount.text = "";
     }
 
-    public void SetItem(SO_Item item, int amount)
+    public void SetItem(InventoryItem item)
     {
-        this.item = item;
-        this.amount = amount;
+        this.item = item.item;
+        this.amount = item.amount;
     }
 
     private void HandleNewSlot(SlotManager newSlot)

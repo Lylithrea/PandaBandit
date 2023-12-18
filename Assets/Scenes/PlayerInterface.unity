@@ -539,6 +539,18 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &509816307 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8706970107794893557, guid: fb1fa4bfea0b32e4ba0162b0d363ff73,
+    type: 3}
+  m_PrefabInstance: {fileID: 4340025937701436298}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &652745082 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9040713448815209781, guid: fb1fa4bfea0b32e4ba0162b0d363ff73,
+    type: 3}
+  m_PrefabInstance: {fileID: 4340025937701436298}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &771527832 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 354672981049821153, guid: fb1fa4bfea0b32e4ba0162b0d363ff73,
@@ -548,6 +560,12 @@ GameObject:
 --- !u!224 &771527833 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2072669283960770818, guid: fb1fa4bfea0b32e4ba0162b0d363ff73,
+    type: 3}
+  m_PrefabInstance: {fileID: 4340025937701436298}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &797146718 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5648391271271250891, guid: fb1fa4bfea0b32e4ba0162b0d363ff73,
     type: 3}
   m_PrefabInstance: {fileID: 4340025937701436298}
   m_PrefabAsset: {fileID: 0}
@@ -728,6 +746,12 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1186133926 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7166891662980491823, guid: fb1fa4bfea0b32e4ba0162b0d363ff73,
+    type: 3}
+  m_PrefabInstance: {fileID: 4340025937701436298}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1194451466
 GameObject:
   m_ObjectHideFlags: 0
@@ -763,6 +787,12 @@ RectTransform:
   m_AnchoredPosition: {x: -4.9999924, y: 0}
   m_SizeDelta: {x: -10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1447283964 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 17758330002827655, guid: fb1fa4bfea0b32e4ba0162b0d363ff73,
+    type: 3}
+  m_PrefabInstance: {fileID: 4340025937701436298}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1456721979
 GameObject:
   m_ObjectHideFlags: 0
@@ -957,7 +987,18 @@ MonoBehaviour:
   raycaster: {fileID: 0}
   draggableItem: {fileID: 2791994070469250195, guid: 5b1a8faafbf5a334e8ab5bd545a9f9be,
     type: 3}
-  slots: []
+  layouts: []
+  currentInventoryLayout: 0
+  slots:
+  - {fileID: 1447283964}
+  - {fileID: 797146718}
+  - {fileID: 509816307}
+  - {fileID: 1186133926}
+  - {fileID: 652745082}
+  items:
+  - {fileID: 11400000, guid: fbb6e06c3d7947a4aa452d2ad1f8303a, type: 2}
+  - {fileID: 11400000, guid: 7b8ae19b6a5834e41a86f4dafc008a10, type: 2}
+  - {fileID: 11400000, guid: 107b1e91efd00b64eb76d5e9445a22ab, type: 2}
 --- !u!1001 &4340025937701436298
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1221,7 +1262,8 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4823140944985298844, guid: fb1fa4bfea0b32e4ba0162b0d363ff73, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
