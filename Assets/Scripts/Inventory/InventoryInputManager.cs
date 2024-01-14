@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class PlayerInventoryManager : InventoryManager
+public class InventoryInputManager : MonoBehaviour
 {
-    private static PlayerInventoryManager instance;
+    private List<InventoryManager> linkedInventories = new List<InventoryManager>();
 
-    private InventoryManager linkedInventory = null;
 
-    [BoxGroup("Debug Tooling")]
-    public List<SO_Item> items = new List<SO_Item>();
+    // MAKE LINK BETWEEN THIS SCRIPT AND OTHER INVENTORIES SO THEY CAN SUBSCRIBE
 
 
     //temporary storage for drag and drop functionality
@@ -19,93 +18,29 @@ public class PlayerInventoryManager : InventoryManager
     SlotManager currentSlot = null;
     InventoryItem currentItem = new InventoryItem(null);
     GameObject dragItem = null;
+    public GraphicRaycaster raycaster;
+    [SerializeField] public GameObject inventoryDragParent;
+    public GameObject draggableItem;
 
-    public static PlayerInventoryManager Instance
+
+
+    public void Update()
     {
-        get
-        {
-            return instance;
-        }
+        updateDraggable();
     }
 
-    #region Start-Up
-    void singletonCreation()
+    public void Start()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-        DontDestroyOnLoad(gameObject);
-    }
-
-    public void Awake()
-    {
-        singletonCreation();
-    }
-
-    public void OnEnable()
-    {
-        //InputManager.Instance.onLeftClick += OnLeftClick;
-        //InputManager.Instance.onRightClick += OnRightClick;
+        raycaster = this.GetComponent<GraphicRaycaster>();
+        InputManager.Instance.onLeftClick += OnLeftClick;
+        InputManager.Instance.onRightClick += OnRightClick;
     }
 
     public void OnDisable()
     {
-        //InputManager.Instance.onLeftClick -= OnLeftClick;
-        //InputManager.Instance.onRightClick -= OnRightClick;
+        InputManager.Instance.onLeftClick -= OnLeftClick;
+        InputManager.Instance.onRightClick -= OnRightClick;
     }
-
-    #endregion
-
-    public override void Update()
-    {
-        base.Update();
-        updateDraggable();
-
-        if (Input.GetKeyDown(KeyCode.Keypad1))
-        {
-            AddItemTemp(1);
-        }
-        else if (Input.GetKeyDown(KeyCode.Keypad2))
-        {
-            AddItemTemp(2);
-        }
-        else if (Input.GetKeyDown(KeyCode.Keypad3))
-        {
-            AddItemTemp(3);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Keypad4))
-        {
-            PlayerInventoryManager.Instance.LinkInventory(this);
-        }
-    }
-
-    /// <summary>
-    /// Temporary method to add items to the inventory
-    /// </summary>
-    /// <param name="item"></param>
-    public void AddItemTemp(int item)
-    {
-        foreach (KeyValuePair<SlotManager, InventoryItem> pair in inventorySlots)
-        {
-            if (pair.Value == null || pair.Value.amount == 0)
-            {
-                InventoryItem newItem = new InventoryItem(null);
-                newItem.item = items[item - 1];
-                newItem.amount = items[item - 1].maxStackSize;
-                inventorySlots[pair.Key] = newItem;
-                pair.Key.updateUI();
-                break;
-            }
-        }
-
-    }
-
 
 
     #region Tooling
@@ -120,7 +55,8 @@ public class PlayerInventoryManager : InventoryManager
         InventoryManager validInventory = GetValidInventory(slot);
         if (validInventory != null)
         {
-            validInventory.inventorySlots[slot] = item;
+            //validInventory.inventorySlots[slot] = item;
+            validInventory.inventoryData.AddItemToSlot(slot.slotID, item);
             slot.updateUI();
         }
     }
@@ -151,6 +87,7 @@ public class PlayerInventoryManager : InventoryManager
                 SetItemToSlot(slot, newItem);
                 InventoryItem oldItem = new InventoryItem(item);
                 oldItem.amount = remainingAmount;
+                //Can cause infinity loop
                 AddItemToSlot(currentSlot, oldItem, remainingAmount);
             }
             else
@@ -170,13 +107,14 @@ public class PlayerInventoryManager : InventoryManager
     /// <returns></returns>
     public InventoryManager GetValidInventory(SlotManager slot)
     {
-        if (inventorySlots.ContainsKey(slot))
+        Debug.Log("Finding valid inventory for slot: " + slot);
+        foreach (InventoryManager inventory in linkedInventories)
         {
-            return this;
-        }
-        else if (linkedInventory == null || linkedInventory.inventorySlots.ContainsKey(slot))
-        {
-            return linkedInventory;
+            Debug.Log("Inventory: " + inventory + " with valid slot: " + inventory.inventorySlots.ContainsKey(slot));
+            if (inventory.inventorySlots.ContainsKey(slot))
+            {
+                return inventory;
+            }
         }
         return null;
     }
@@ -191,7 +129,9 @@ public class PlayerInventoryManager : InventoryManager
         InventoryManager validInventory = GetValidInventory(slot);
         if (validInventory != null)
         {
-            InventoryItem item = validInventory.inventorySlots[slot];
+            //InventoryItem item = validInventory.inventorySlots[slot];
+            InventoryItem item = validInventory.inventoryData.GetItemFromSlot(slot.slotID);
+            Debug.Log("Getting item from slot with id: " + slot.slotID + " with item: " + item);
             return item;
         }
 
@@ -207,7 +147,7 @@ public class PlayerInventoryManager : InventoryManager
     public InventoryItem RemoveItemFromSlot(SlotManager slot, int amount)
     {
         InventoryManager validInventory = GetValidInventory(slot);
-        
+
         if (validInventory != null)
         {
             InventoryItem removedItem = new InventoryItem(GetItemFromSlot(slot));
@@ -215,7 +155,7 @@ public class PlayerInventoryManager : InventoryManager
             //if amount is 0 or below (shouldnt be) then set item to null
             if (removedItem.amount <= 0)
             {
-                validInventory.inventorySlots[slot] = null;
+                validInventory.inventoryData.RemoveItemFromSlot(slot.slotID);
                 slot.updateUI();
                 return null;
             }
@@ -224,7 +164,7 @@ public class PlayerInventoryManager : InventoryManager
                 //update item to new amount
                 InventoryItem updatedItem = new InventoryItem(GetItemFromSlot(slot));
                 updatedItem.amount -= amount;
-                validInventory.inventorySlots[slot] = updatedItem;
+                validInventory.inventoryData.AddItemToSlot(slot.slotID, updatedItem);
                 slot.updateUI();
                 return removedItem;
             }
@@ -251,6 +191,7 @@ public class PlayerInventoryManager : InventoryManager
     /// </summary>
     public void OnLeftClick()
     {
+        Debug.Log("Input Left Click!" + isDraggingItem);
         SlotManager slot = GetSlotUnderMouse();
         if (slot == null) return;
 
@@ -277,6 +218,7 @@ public class PlayerInventoryManager : InventoryManager
     /// </summary>
     public void OnRightClick()
     {
+        Debug.Log("Input Right Click!");
         SlotManager slot = GetSlotUnderMouse();
         if (slot == null) return;
 
@@ -318,7 +260,7 @@ public class PlayerInventoryManager : InventoryManager
         }
         return uiElements;
     }
-    
+
     /// <summary>
     /// Gets the first slot under the mouse
     /// </summary>
@@ -411,7 +353,7 @@ public class PlayerInventoryManager : InventoryManager
             {
                 SetItemToSlot(currentSlot, GetItemFromSlot(newSlot));
                 SetItemToSlot(newSlot, currentItem);
-                ResetItem();   
+                ResetItem();
                 return true;
             }
         }
@@ -443,7 +385,7 @@ public class PlayerInventoryManager : InventoryManager
     {
         InventoryItem slotItem = GetItemFromSlot(newSlot);
         if (slotItem == null || slotItem.amount <= 0)
-        { 
+        {
             SetItemToSlot(newSlot, currentItem);
             ResetItem();
             return false;
@@ -506,22 +448,26 @@ public class PlayerInventoryManager : InventoryManager
     /// <param name="inventory"></param>
     public void LinkInventory(InventoryManager inventory)
     {
-        linkedInventory = inventory;
+        linkedInventories.Add(inventory);
         Debug.Log("Player inventory linked with inventory: " + inventory);
     }
 
     /// <summary>
     /// Unlinks inventory from player inventory
     /// </summary>
-    public void UnlinkInventory()
+    public void UnlinkInventory(InventoryManager inventory)
     {
-        linkedInventory = null;
-        Debug.Log("Player inventory unlinked");
+        foreach (InventoryManager linkInventory in linkedInventories)
+        {
+            if (linkInventory == inventory)
+            {
+                linkedInventories.Remove(inventory);
+                Debug.Log("Player inventory unlinked");
+                return;
+            }
+        }
+
     }
     #endregion
-
-
-
-
 
 }

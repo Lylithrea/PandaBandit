@@ -37,13 +37,10 @@ public class InventoryManager : MonoBehaviour
     public GraphicRaycaster raycaster;
     public GameObject draggableItem;
 
-    public List<GameObject> layouts = new List<GameObject>();
-    public int currentInventoryLayout = 0;
-
     public List<GameObject> slots = new List<GameObject>();
     public Dictionary<SlotManager, InventoryItem> inventorySlots = new Dictionary<SlotManager, InventoryItem>();
 
-
+    public InventoryData inventoryData;
 
     
 
@@ -52,6 +49,7 @@ public class InventoryManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        inventoryData = new InventoryData(this.gameObject.name);
         raycaster = this.GetComponent<GraphicRaycaster>();
         SetupSlots();
     }
@@ -59,12 +57,15 @@ public class InventoryManager : MonoBehaviour
     private void SetupSlots()
     {
         inventorySlots.Clear();
-        for(int i = 0; i < slots.Count; i++)
+        //create inventory data slots, this should later be when a file does exist or not
+        inventoryData.AddSlots(slots.Count);
+        for (int i = 0; i < slots.Count; i++)
         {
             SlotManager newSlot = slots[i].GetComponent<SlotManager>();
             if (newSlot != null)
             {
                 inventorySlots.Add(newSlot, null);
+                newSlot.slotID = i;
                 newSlot.updateUI();
             }
         }

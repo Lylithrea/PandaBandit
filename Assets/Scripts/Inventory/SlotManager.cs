@@ -15,6 +15,7 @@ public class SlotManager : MonoBehaviour
     public TextMeshProUGUI amountText;
 
     public int amount = 0;
+    public int slotID = 0;
 
 
     public void updateUI()
