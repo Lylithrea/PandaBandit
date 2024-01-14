@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 [Serializable]
@@ -12,6 +13,21 @@ public class InventoryItem
 {
     public SO_Item item;
     public int amount;
+
+    public InventoryItem(InventoryItem item)
+    {
+        if (item == null)
+        {
+            this.item = null;
+            this.amount = 0;
+        }
+        else
+        {
+            this.item = item.item;
+            this.amount = item.amount;
+        }
+
+    }
 }
 
 public class InventoryManager : MonoBehaviour
@@ -59,6 +75,7 @@ public class InventoryManager : MonoBehaviour
     public virtual void Update()
     {
     }
+
 
 
 

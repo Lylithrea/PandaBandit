@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SlotManager : MonoBehaviour, IPointerClickHandler
+public class SlotManager : MonoBehaviour
 {
 
     public ItemVariant variant;
@@ -50,10 +50,10 @@ public class SlotManager : MonoBehaviour, IPointerClickHandler
 
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+/*    public void OnPointerClick(PointerEventData eventData)
     {
         Debug.Log("User clicked on a slot!");
         PlayerInventoryManager.Instance.HandleClick(this);
-    }
+    }*/
 }
 
