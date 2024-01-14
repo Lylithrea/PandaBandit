@@ -21,7 +21,6 @@ public class SlotManager : MonoBehaviour
     {
 
         InventoryItem inventoryItem = PlayerInventoryManager.Instance.GetItemFromSlot(this);
-        Debug.Log("Trying to update the UI of slot: " + this.gameObject.name + " with the current item value: " + inventoryItem);
         if (inventoryItem != null)
         {
             if (inventoryItem.amount == 0)
