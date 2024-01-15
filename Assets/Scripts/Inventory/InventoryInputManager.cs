@@ -4,14 +4,30 @@ using UnityEngine;
 using NaughtyAttributes;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 
 public class InventoryInputManager : MonoBehaviour
 {
     private List<InventoryManager> linkedInventories = new List<InventoryManager>();
 
 
-    // MAKE LINK BETWEEN THIS SCRIPT AND OTHER INVENTORIES SO THEY CAN SUBSCRIBE
+    // TODO
+    // LINKING BETWEEN INVENTORIES IS HORRIBLE
+    // DOES CONSISTENTLY PICK THE WRONG SLOTS
+    // RIGHT NOW THE MAIN ISSUE IS THAT TO GET A VALID INVENTORY IT CHECKS IF COUNT IS HIGHER THAN THE SLOT REQUESTED
+    // SO IT WILL ALWAYS PICK STORAGE INVENTORY INSTEAD OF PLAYER, WHICH IS BAD
+    //
+    // PREFERABLY REWRITE THIS FLOW FROM PAPER INSTEAD OF FUCKING AROUND
+    //
+    //
+    //
+    // If you only link the player inventory, all the remaining code does work :D
+    //
 
+
+
+    // MAKE LINK BETWEEN THIS SCRIPT AND OTHER INVENTORIES SO THEY CAN SUBSCRIBE
+    private static InventoryInputManager instance;
 
     //temporary storage for drag and drop functionality
     private bool isDraggingItem = false;
@@ -22,11 +38,80 @@ public class InventoryInputManager : MonoBehaviour
     [SerializeField] public GameObject inventoryDragParent;
     public GameObject draggableItem;
 
+    [BoxGroup("Debug Tooling")]
+    public List<SO_Item> items = new List<SO_Item>();
 
+
+    public static InventoryInputManager Instance
+    {
+        get
+        {
+            return instance;
+        }
+    }
+
+    #region Start-Up
+    void singletonCreation()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public void Awake()
+    {
+        singletonCreation();
+    }
+
+    #endregion
 
     public void Update()
     {
         updateDraggable();
+
+        if (Input.GetKeyDown(KeyCode.Keypad1))
+        {
+            AddItemTemp(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Keypad2))
+        {
+            AddItemTemp(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Keypad3))
+        {
+            AddItemTemp(3);
+        }
+    }
+
+
+    /// <summary>
+    /// Temporary method to add items to the inventory
+    /// </summary>
+    /// <param name="item"></param>
+    public void AddItemTemp(int item)
+    {
+
+        Dictionary<int, InventoryItem> playerInventory = PlayerInventory.Instance.inventory.inventoryData;
+        for (int i = 0; i < playerInventory.Count; i++)
+        {
+            if (playerInventory[i] == null)
+            {
+                InventoryItem newItem = new InventoryItem(null);
+                newItem.item = items[item - 1];
+                newItem.amount = items[item - 1].maxStackSize;
+                PlayerInventory.Instance.inventory.AddItemToSlot(i, newItem);
+                PlayerInventoryManager.Instance.slots[i].GetComponent<SlotManager>().updateUI();
+                break;
+            }
+
+        }
+
     }
 
     public void Start()
@@ -44,6 +129,12 @@ public class InventoryInputManager : MonoBehaviour
 
 
     #region Tooling
+
+    // Data will be set in the data class
+    // Data class can be adjusted from outside only methods
+    // Visualization goes through inventory manager
+    // Inventory links slots to data with numbers
+
 
     /// <summary>
     /// Overwrites the slot data, and sets the item
@@ -110,8 +201,12 @@ public class InventoryInputManager : MonoBehaviour
         Debug.Log("Finding valid inventory for slot: " + slot);
         foreach (InventoryManager inventory in linkedInventories)
         {
-            Debug.Log("Inventory: " + inventory + " with valid slot: " + inventory.inventorySlots.ContainsKey(slot));
-            if (inventory.inventorySlots.ContainsKey(slot))
+            Debug.Log("Inventory: " + inventory + " with max slots: " + inventory.slots.Count + " and needing: " + slot.slotID);
+/*            if (inventory.inventorySlots.ContainsKey(slot))
+            {
+                return inventory;
+            }*/
+            if (inventory.slots.Count > slot.slotID)
             {
                 return inventory;
             }
@@ -129,9 +224,13 @@ public class InventoryInputManager : MonoBehaviour
         InventoryManager validInventory = GetValidInventory(slot);
         if (validInventory != null)
         {
+            //ISSUE: 
+            // inventorydata is a variable name from inventorymanager
+            // this does not work for the player inventory as its not an inventory manager
+
             //InventoryItem item = validInventory.inventorySlots[slot];
             InventoryItem item = validInventory.inventoryData.GetItemFromSlot(slot.slotID);
-            Debug.Log("Getting item from slot with id: " + slot.slotID + " with item: " + item);
+            Debug.Log("Getting item from inventory " + validInventory + " and slot with id: " + slot.slotID + " with item: " + item);
             return item;
         }
 

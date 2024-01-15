@@ -5,8 +5,8 @@ using UnityEngine;
 public class PlayerInventory : MonoBehaviour
 {
     public static PlayerInventory instance;
-    public InventoryData inventoryData = new InventoryData("playerInventory");
-
+    public InventoryData inventory = new InventoryData("playerInventory");
+    public int inventorySize = 10;
 
     public static PlayerInventory Instance
     {
@@ -32,6 +32,11 @@ public class PlayerInventory : MonoBehaviour
     public void Awake()
     {
         singletonCreation();
+    }
+
+    public void Start()
+    {
+        inventory.AddSlots(inventorySize);
     }
 
 

@@ -13,7 +13,7 @@ public class StorageInventoryManager : InventoryManager
 
         if (Input.GetKeyDown(KeyCode.Keypad0))
         {
-            PlayerInventoryManager.Instance.LinkInventory(this);
+            InventoryInputManager.Instance.LinkInventory(this);
         }
 
     }

@@ -17,6 +17,7 @@ public class InventoryData
     {
         if (inventoryData.ContainsKey(slotIndex))
         {
+            Debug.Log("Added an item to slot: " + slotIndex + " with item: " + item);
             inventoryData[slotIndex] = item;
         }
     }
@@ -31,11 +32,18 @@ public class InventoryData
 
     public InventoryItem GetItemFromSlot(int slotIndex)
     {
+        Debug.Log("Getting item from slot: " + slotIndex);
         if (inventoryData.ContainsKey(slotIndex))
         {
+            Debug.Log("Got item from slot: " + inventoryData[slotIndex]);
             return inventoryData[slotIndex];
         }
         return null;
+    }
+
+    public Dictionary<int, InventoryItem> GetAllItems()
+    {
+        return inventoryData;
     }
 
     public void AddSlots(int amount)

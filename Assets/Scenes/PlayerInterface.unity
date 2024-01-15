@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 262.38358, g: 325.10843, b: 430.30963, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -268,8 +268,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e55fb9cd7b69c640ac775f822bf8c1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputAsset: {fileID: -944628639613478452, guid: a16b12ffe402d9e40a71df48626a3da9,
-    type: 3}
 --- !u!1 &266862595
 GameObject:
   m_ObjectHideFlags: 0
@@ -966,6 +964,8 @@ GameObject:
   - component: {fileID: 1651932945}
   - component: {fileID: 1651932944}
   - component: {fileID: 1651932948}
+  - component: {fileID: 1651932949}
+  - component: {fileID: 1651932950}
   m_Layer: 5
   m_Name: Inventory
   m_TagString: Untagged
@@ -1073,18 +1073,45 @@ MonoBehaviour:
   raycaster: {fileID: 0}
   draggableItem: {fileID: 2791994070469250195, guid: 5b1a8faafbf5a334e8ab5bd545a9f9be,
     type: 3}
-  layouts: []
-  currentInventoryLayout: 0
   slots:
   - {fileID: 1447283964}
   - {fileID: 797146718}
   - {fileID: 509816307}
   - {fileID: 1186133926}
   - {fileID: 652745082}
+--- !u!114 &1651932949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651932943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c39dd1347670ae54f8d770d55de55afc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  raycaster: {fileID: 0}
+  inventoryDragParent: {fileID: 771527832}
+  draggableItem: {fileID: 2791994070469250195, guid: 5b1a8faafbf5a334e8ab5bd545a9f9be,
+    type: 3}
   items:
   - {fileID: 11400000, guid: fbb6e06c3d7947a4aa452d2ad1f8303a, type: 2}
   - {fileID: 11400000, guid: 7b8ae19b6a5834e41a86f4dafc008a10, type: 2}
   - {fileID: 11400000, guid: 107b1e91efd00b64eb76d5e9445a22ab, type: 2}
+--- !u!114 &1651932950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651932943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07edafe2e1d42d947aab8f1c3e66ee0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventorySize: 10
 --- !u!1 &1697474658
 GameObject:
   m_ObjectHideFlags: 0
@@ -1137,8 +1164,6 @@ MonoBehaviour:
   raycaster: {fileID: 0}
   draggableItem: {fileID: 2791994070469250195, guid: 5b1a8faafbf5a334e8ab5bd545a9f9be,
     type: 3}
-  layouts: []
-  currentInventoryLayout: 0
   slots:
   - {fileID: 1047365228}
   - {fileID: 1877141017}

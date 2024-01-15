@@ -10,8 +10,6 @@ public class PlayerInventoryManager : InventoryManager
 
     private InventoryManager linkedInventory = null;
 
-    [BoxGroup("Debug Tooling")]
-    public List<SO_Item> items = new List<SO_Item>();
 
 
     //temporary storage for drag and drop functionality
@@ -47,6 +45,11 @@ public class PlayerInventoryManager : InventoryManager
         singletonCreation();
     }
 
+    public void Start()
+    {
+        inventoryData = PlayerInventory.Instance.inventory;
+    }
+
     public void OnEnable()
     {
         //InputManager.Instance.onLeftClick += OnLeftClick;
@@ -66,26 +69,15 @@ public class PlayerInventoryManager : InventoryManager
         base.Update();
         updateDraggable();
 
-        if (Input.GetKeyDown(KeyCode.Keypad1))
-        {
-            AddItemTemp(1);
-        }
-        else if (Input.GetKeyDown(KeyCode.Keypad2))
-        {
-            AddItemTemp(2);
-        }
-        else if (Input.GetKeyDown(KeyCode.Keypad3))
-        {
-            AddItemTemp(3);
-        }
+
 
         if (Input.GetKeyDown(KeyCode.Keypad4))
         {
-            PlayerInventoryManager.Instance.LinkInventory(this);
+            InventoryInputManager.Instance.LinkInventory(this);
         }
     }
 
-    /// <summary>
+/*    /// <summary>
     /// Temporary method to add items to the inventory
     /// </summary>
     /// <param name="item"></param>
@@ -104,7 +96,8 @@ public class PlayerInventoryManager : InventoryManager
             }
         }
 
-    }
+
+    }*/
 
 
 

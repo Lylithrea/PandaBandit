@@ -21,7 +21,7 @@ public class SlotManager : MonoBehaviour
     public void updateUI()
     {
 
-        InventoryItem inventoryItem = PlayerInventoryManager.Instance.GetItemFromSlot(this);
+        InventoryItem inventoryItem = PlayerInventory.Instance.inventory.GetItemFromSlot(slotID);
         if (inventoryItem != null)
         {
             if (inventoryItem.amount == 0)
