@@ -17,11 +17,21 @@ public class SlotManager : MonoBehaviour
     public int amount = 0;
     public int slotID = 0;
 
+    private InventoryManager linkedInventory;
+
+    public void Setup(InventoryManager inventoryManager)
+    {
+        linkedInventory = inventoryManager;
+    }
+
 
     public void updateUI()
     {
+        Debug.Log("linked inventory: " + linkedInventory);
+        Debug.Log("inventory data: " + linkedInventory.GetInventoryData());
+        Debug.Log("item: " + linkedInventory.GetInventoryData().GetItemFromSlot(slotID));
+        InventoryItem inventoryItem = linkedInventory.GetInventoryData().GetItemFromSlot(slotID);
 
-        InventoryItem inventoryItem = PlayerInventory.Instance.inventory.GetItemFromSlot(slotID);
         if (inventoryItem != null)
         {
             if (inventoryItem.amount == 0)

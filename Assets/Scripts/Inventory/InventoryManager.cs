@@ -44,10 +44,13 @@ public class InventoryManager : MonoBehaviour
 
     
 
-
+    public virtual InventoryData GetInventoryData()
+    {
+        return inventoryData;
+    }
 
     // Start is called before the first frame update
-    void Start()
+    public virtual void Start()
     {
         inventoryData = new InventoryData(this.gameObject.name);
         raycaster = this.GetComponent<GraphicRaycaster>();
@@ -65,7 +68,8 @@ public class InventoryManager : MonoBehaviour
             if (newSlot != null)
             {
                 inventorySlots.Add(newSlot, null);
-                newSlot.slotID = i;
+                slots[i].GetComponent<SlotManager>().slotID = i;
+                slots[i].GetComponent<SlotManager>().Setup(this);
                 newSlot.updateUI();
             }
         }

@@ -45,9 +45,15 @@ public class PlayerInventoryManager : InventoryManager
         singletonCreation();
     }
 
-    public void Start()
+    public override void Start()
     {
+        base.Start();
         inventoryData = PlayerInventory.Instance.inventory;
+    }
+
+    public override InventoryData GetInventoryData()
+    {
+        return inventoryData;
     }
 
     public void OnEnable()
@@ -75,6 +81,15 @@ public class PlayerInventoryManager : InventoryManager
         {
             InventoryInputManager.Instance.LinkInventory(this);
         }
+        if (Input.GetKeyDown(KeyCode.Keypad5))
+        {
+            inventoryData.SaveInventoryDataToJson();
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad6))
+        {
+            inventoryData.LoadInventoryDataFromJson();
+        }
+
     }
 
 /*    /// <summary>

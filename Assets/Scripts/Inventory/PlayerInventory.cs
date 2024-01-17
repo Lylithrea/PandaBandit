@@ -36,7 +36,9 @@ public class PlayerInventory : MonoBehaviour
 
     public void Start()
     {
+        inventory = new InventoryData("playerInventory");
         inventory.AddSlots(inventorySize);
+        Debug.Log("Created inventory slots");
     }
 
 

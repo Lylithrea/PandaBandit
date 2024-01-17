@@ -96,8 +96,11 @@ public class InventoryInputManager : MonoBehaviour
     /// <param name="item"></param>
     public void AddItemTemp(int item)
     {
-
+        Debug.Log("player: " + PlayerInventory.instance);
+        Debug.Log("inventory: " + PlayerInventory.instance.inventory);
+        Debug.Log("data: " + PlayerInventory.instance.inventory.inventoryData);
         Dictionary<int, InventoryItem> playerInventory = PlayerInventory.Instance.inventory.inventoryData;
+
         for (int i = 0; i < playerInventory.Count; i++)
         {
             if (playerInventory[i] == null)
@@ -208,7 +211,14 @@ public class InventoryInputManager : MonoBehaviour
             }*/
             if (inventory.slots.Count > slot.slotID)
             {
-                return inventory;
+                Debug.Log("Inventory is bigger");
+                Debug.Log("Count: " + inventory.slots.Count + " slot id: " + slot.slotID + " slot: " + slot + " inventory slot: " + inventory.slots[slot.slotID]);
+                if (inventory.slots[slot.slotID] == slot.gameObject)
+                {
+                    Debug.Log("Inventory is same slot");
+                    return inventory;
+                }
+
             }
         }
         return null;
