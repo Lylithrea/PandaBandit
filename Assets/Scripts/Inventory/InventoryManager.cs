@@ -46,18 +46,30 @@ public class InventoryManager : MonoBehaviour
 
     public virtual InventoryData GetInventoryData()
     {
+/*        if (inventoryData == null)
+        {
+            inventoryData = new InventoryData(this.gameObject.name);
+            SetupSlots();
+        }*/
         return inventoryData;
     }
 
     // Start is called before the first frame update
     public virtual void Start()
     {
-        inventoryData = new InventoryData(this.gameObject.name);
+
         raycaster = this.GetComponent<GraphicRaycaster>();
+        SetupInventory();
+    }
+
+    public virtual void SetupInventory()
+    {
+        inventoryData = new InventoryData(this.gameObject.name);
+        inventoryData.savePath = Application.persistentDataPath + "/InventoryData/";
         SetupSlots();
     }
 
-    private void SetupSlots()
+    public virtual void SetupSlots()
     {
         inventorySlots.Clear();
         //create inventory data slots, this should later be when a file does exist or not

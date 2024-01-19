@@ -21,6 +21,7 @@ public class SlotManager : MonoBehaviour
 
     public void Setup(InventoryManager inventoryManager)
     {
+        Debug.Log("Linking with inventory: " + inventoryManager);
         linkedInventory = inventoryManager;
     }
 

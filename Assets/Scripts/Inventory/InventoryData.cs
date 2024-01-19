@@ -15,7 +15,7 @@ public class InventoryData
         Debug.Log("New inventory data created with name: " + fileName);
     }
 
-    private string savePath = Application.persistentDataPath + "/InventoryData/";
+    public string savePath;
 
     public void AddItemToSlot(int slotIndex, InventoryItem item)
     {
@@ -23,6 +23,7 @@ public class InventoryData
         {
             Debug.Log("Added an item to slot: " + slotIndex + " with item: " + item + " in inventory: " + fileName);
             inventoryData[slotIndex] = item;
+            Debug.Log("Slot contains now: " + inventoryData[slotIndex]);
         }
     }
 
@@ -61,23 +62,6 @@ public class InventoryData
     public void RemoveSlots(int amount)
     {
         Debug.LogWarning("Removing slots still needs to be implemented!");
-    }
-
-    public void LoadInventoryDataFromJson()
-    {
-        Debug.LogWarning("Loading inventory still needs to be implemented!");
-        if (File.Exists(savePath))
-        {
-            string json = File.ReadAllText(savePath);
-            inventoryData = JsonUtility.FromJson<Dictionary<int, InventoryItem>>(json);
-        }
-    }
-
-    public void SaveInventoryDataToJson()
-    {
-        Debug.LogWarning("Saving inventory still needs to be implemented!");
-        string json = JsonUtility.ToJson(inventoryData);
-        File.WriteAllText(savePath, json);
     }
 
 

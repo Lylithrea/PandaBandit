@@ -10,23 +10,6 @@ public class InventoryInputManager : MonoBehaviour
 {
     private List<InventoryManager> linkedInventories = new List<InventoryManager>();
 
-
-    // TODO
-    // LINKING BETWEEN INVENTORIES IS HORRIBLE
-    // DOES CONSISTENTLY PICK THE WRONG SLOTS
-    // RIGHT NOW THE MAIN ISSUE IS THAT TO GET A VALID INVENTORY IT CHECKS IF COUNT IS HIGHER THAN THE SLOT REQUESTED
-    // SO IT WILL ALWAYS PICK STORAGE INVENTORY INSTEAD OF PLAYER, WHICH IS BAD
-    //
-    // PREFERABLY REWRITE THIS FLOW FROM PAPER INSTEAD OF FUCKING AROUND
-    //
-    //
-    //
-    // If you only link the player inventory, all the remaining code does work :D
-    //
-
-
-
-    // MAKE LINK BETWEEN THIS SCRIPT AND OTHER INVENTORIES SO THEY CAN SUBSCRIBE
     private static InventoryInputManager instance;
 
     //temporary storage for drag and drop functionality

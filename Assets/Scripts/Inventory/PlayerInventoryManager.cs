@@ -10,8 +10,6 @@ public class PlayerInventoryManager : InventoryManager
 
     private InventoryManager linkedInventory = null;
 
-
-
     //temporary storage for drag and drop functionality
     private bool isDraggingItem = false;
     SlotManager currentSlot = null;
@@ -45,28 +43,37 @@ public class PlayerInventoryManager : InventoryManager
         singletonCreation();
     }
 
-    public override void Start()
+    public override void SetupInventory()
     {
-        base.Start();
         inventoryData = PlayerInventory.Instance.inventory;
+        inventoryData.savePath = Application.persistentDataPath + "/InventoryData/";
+        SetupSlots();
     }
+
+    public override void SetupSlots()
+    {
+        inventorySlots.Clear();
+        //create inventory data slots, this should later be when a file does exist or not
+        inventoryData.AddSlots(slots.Count);
+        for (int i = 0; i < slots.Count; i++)
+        {
+            SlotManager newSlot = slots[i].GetComponent<SlotManager>();
+            if (newSlot != null)
+            {
+                inventorySlots.Add(newSlot, null);
+                slots[i].GetComponent<SlotManager>().slotID = i;
+                slots[i].GetComponent<SlotManager>().Setup(this);
+                newSlot.updateUI();
+            }
+        }
+    }
+
 
     public override InventoryData GetInventoryData()
     {
         return inventoryData;
     }
 
-    public void OnEnable()
-    {
-        //InputManager.Instance.onLeftClick += OnLeftClick;
-        //InputManager.Instance.onRightClick += OnRightClick;
-    }
-
-    public void OnDisable()
-    {
-        //InputManager.Instance.onLeftClick -= OnLeftClick;
-        //InputManager.Instance.onRightClick -= OnRightClick;
-    }
 
     #endregion
 
@@ -83,11 +90,11 @@ public class PlayerInventoryManager : InventoryManager
         }
         if (Input.GetKeyDown(KeyCode.Keypad5))
         {
-            inventoryData.SaveInventoryDataToJson();
+            //inventoryData.SaveInventoryDataToJson();
         }
         if (Input.GetKeyDown(KeyCode.Keypad6))
         {
-            inventoryData.LoadInventoryDataFromJson();
+            //inventoryData.LoadInventoryDataFromJson();
         }
 
     }
