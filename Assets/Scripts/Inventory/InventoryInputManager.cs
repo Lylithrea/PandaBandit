@@ -21,10 +21,6 @@ public class InventoryInputManager : MonoBehaviour
     [SerializeField] public GameObject inventoryDragParent;
     public GameObject draggableItem;
 
-    [BoxGroup("Debug Tooling")]
-    public List<SO_Item> items = new List<SO_Item>();
-
-
     public static InventoryInputManager Instance
     {
         get
@@ -58,47 +54,10 @@ public class InventoryInputManager : MonoBehaviour
     {
         updateDraggable();
 
-        if (Input.GetKeyDown(KeyCode.Keypad1))
-        {
-            AddItemTemp(1);
-        }
-        else if (Input.GetKeyDown(KeyCode.Keypad2))
-        {
-            AddItemTemp(2);
-        }
-        else if (Input.GetKeyDown(KeyCode.Keypad3))
-        {
-            AddItemTemp(3);
-        }
-    }
-
-
-    /// <summary>
-    /// Temporary method to add items to the inventory
-    /// </summary>
-    /// <param name="item"></param>
-    public void AddItemTemp(int item)
-    {
-        Debug.Log("player: " + PlayerInventory.instance);
-        Debug.Log("inventory: " + PlayerInventory.instance.inventory);
-        Debug.Log("data: " + PlayerInventory.instance.inventory.inventoryData);
-        Dictionary<int, InventoryItem> playerInventory = PlayerInventory.Instance.inventory.inventoryData;
-
-        for (int i = 0; i < playerInventory.Count; i++)
-        {
-            if (playerInventory[i] == null)
-            {
-                InventoryItem newItem = new InventoryItem(null);
-                newItem.item = items[item - 1];
-                newItem.amount = items[item - 1].maxStackSize;
-                PlayerInventory.Instance.inventory.AddItemToSlot(i, newItem);
-                PlayerInventoryManager.Instance.slots[i].GetComponent<SlotManager>().updateUI();
-                break;
-            }
-
-        }
 
     }
+
+
 
     public void Start()
     {
@@ -133,7 +92,7 @@ public class InventoryInputManager : MonoBehaviour
         if (validInventory != null)
         {
             //validInventory.inventorySlots[slot] = item;
-            validInventory.inventoryData.AddItemToSlot(slot.slotID, item);
+            validInventory.GetInventoryData().AddItemToSlot(slot.slotID, item);
             slot.updateUI();
         }
     }
@@ -217,12 +176,7 @@ public class InventoryInputManager : MonoBehaviour
         InventoryManager validInventory = GetValidInventory(slot);
         if (validInventory != null)
         {
-            //ISSUE: 
-            // inventorydata is a variable name from inventorymanager
-            // this does not work for the player inventory as its not an inventory manager
-
-            //InventoryItem item = validInventory.inventorySlots[slot];
-            InventoryItem item = validInventory.inventoryData.GetItemFromSlot(slot.slotID);
+            InventoryItem item = validInventory.GetInventoryData().GetItemFromSlot(slot.slotID);
             Debug.Log("Getting item from inventory " + validInventory + " and slot with id: " + slot.slotID + " with item: " + item);
             return item;
         }
@@ -264,10 +218,21 @@ public class InventoryInputManager : MonoBehaviour
         return null;
     }
 
+    public void ClearItemSlot(SlotManager slot)
+    {
+        InventoryManager validInventory = GetValidInventory(slot);
+
+        if (validInventory != null)
+        {
+            validInventory.GetInventoryData().RemoveItemFromSlot(slot.slotID);
+        }
+    }
+
+
     /// <summary>
-    /// Resets the temporary data for the drag and drop function
-    /// </summary>
-    private void ResetItem()
+        /// Resets the temporary data for the drag and drop function
+        /// </summary>
+        private void ResetItem()
     {
         currentSlot = null;
         currentItem = null;
@@ -294,7 +259,7 @@ public class InventoryInputManager : MonoBehaviour
 
             currentItem = new InventoryItem(iventoryItem);
             currentSlot = slot;
-            SetItemToSlot(slot, null);
+            ClearItemSlot(slot);
             slot.updateUI();
             CreateDraggable();
         }
@@ -417,6 +382,8 @@ public class InventoryInputManager : MonoBehaviour
         }
         else
         {
+            if (GetValidInventory(newSlot) == null) { ResetToOldPosition(); return; }
+
             if (!IsValidItemType(newSlot, currentItem)) { ResetToOldPosition(); return; }
 
             if (!isSlotTaken(newSlot)) return;
@@ -541,7 +508,7 @@ public class InventoryInputManager : MonoBehaviour
     public void LinkInventory(InventoryManager inventory)
     {
         linkedInventories.Add(inventory);
-        Debug.Log("Player inventory linked with inventory: " + inventory);
+        Debug.Log("Inventory linked with inventory: " + inventory);
     }
 
     /// <summary>

@@ -24,6 +24,8 @@ public class InventoryData
             Debug.Log("Added an item to slot: " + slotIndex + " with item: " + item + " in inventory: " + fileName);
             inventoryData[slotIndex] = item;
             Debug.Log("Slot contains now: " + inventoryData[slotIndex]);
+            Debug.Log("Item: " + item.item);
+            Debug.Log("Amount: " + item.amount);
         }
     }
 
@@ -37,7 +39,7 @@ public class InventoryData
 
     public InventoryItem GetItemFromSlot(int slotIndex)
     {
-        Debug.Log("Getting item from slot: " + slotIndex + " with inventory: " + fileName);
+        Debug.Log("Getting item from slot: " + slotIndex + " with filename: " + fileName + " and inventory: " + inventoryData) ;
         if (inventoryData.ContainsKey(slotIndex))
         {
             Debug.Log("Got item from slot: " + inventoryData[slotIndex]);

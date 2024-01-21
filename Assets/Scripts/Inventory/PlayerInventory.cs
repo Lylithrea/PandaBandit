@@ -8,6 +8,13 @@ public class PlayerInventory : MonoBehaviour
     public InventoryData inventory = new InventoryData("playerInventory");
     public int inventorySize = 10;
 
+
+    public ref InventoryData GetInventory()
+    {
+        Debug.Log("Return player inventory...");
+        return ref inventory;
+    }
+
     public static PlayerInventory Instance
     {
         get

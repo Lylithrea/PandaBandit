@@ -30,6 +30,7 @@ public class SlotManager : MonoBehaviour
     {
         Debug.Log("linked inventory: " + linkedInventory);
         Debug.Log("inventory data: " + linkedInventory.GetInventoryData());
+        Debug.Log("inventory data filename: " + linkedInventory.GetInventoryData().fileName);
         Debug.Log("item: " + linkedInventory.GetInventoryData().GetItemFromSlot(slotID));
         InventoryItem inventoryItem = linkedInventory.GetInventoryData().GetItemFromSlot(slotID);
 

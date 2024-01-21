@@ -40,18 +40,22 @@ public class InventoryManager : MonoBehaviour
     public List<GameObject> slots = new List<GameObject>();
     public Dictionary<SlotManager, InventoryItem> inventorySlots = new Dictionary<SlotManager, InventoryItem>();
 
-    public InventoryData inventoryData;
+    public InventoryData localInventoryData;
+
+    public InventoryData inventoryData {
+        get { return GetInventoryData(); }
+    }
 
     
 
     public virtual InventoryData GetInventoryData()
     {
-/*        if (inventoryData == null)
+        if (localInventoryData == null)
         {
-            inventoryData = new InventoryData(this.gameObject.name);
-            SetupSlots();
-        }*/
-        return inventoryData;
+            localInventoryData = new InventoryData(gameObject.name);
+            Debug.LogWarning("Did not have a local inventory data yet for object: " + gameObject.name);
+        }
+        return localInventoryData;
     }
 
     // Start is called before the first frame update
@@ -64,7 +68,6 @@ public class InventoryManager : MonoBehaviour
 
     public virtual void SetupInventory()
     {
-        inventoryData = new InventoryData(this.gameObject.name);
         inventoryData.savePath = Application.persistentDataPath + "/InventoryData/";
         SetupSlots();
     }
