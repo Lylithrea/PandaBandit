@@ -28,10 +28,6 @@ public class SlotManager : MonoBehaviour
 
     public void updateUI()
     {
-        Debug.Log("linked inventory: " + linkedInventory);
-        Debug.Log("inventory data: " + linkedInventory.GetInventoryData());
-        Debug.Log("inventory data filename: " + linkedInventory.GetInventoryData().fileName);
-        Debug.Log("item: " + linkedInventory.GetInventoryData().GetItemFromSlot(slotID));
         InventoryItem inventoryItem = linkedInventory.GetInventoryData().GetItemFromSlot(slotID);
 
         if (inventoryItem != null)
@@ -61,11 +57,5 @@ public class SlotManager : MonoBehaviour
         return;
 
     }
-
-/*    public void OnPointerClick(PointerEventData eventData)
-    {
-        Debug.Log("User clicked on a slot!");
-        PlayerInventoryManager.Instance.HandleClick(this);
-    }*/
 }
 

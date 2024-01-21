@@ -56,11 +56,12 @@ public class PlayerInventoryManager : InventoryManager
         }
         if (Input.GetKeyDown(KeyCode.Keypad5))
         {
-            //inventoryData.SaveInventoryDataToJson();
+            inventoryData.PrepareToSaveInventory();
         }
         if (Input.GetKeyDown(KeyCode.Keypad6))
         {
-            //inventoryData.LoadInventoryDataFromJson();
+            inventoryData.LoadInventoryDataFromJson();
+            UpdateAllSlots();
         }
 
         if (Input.GetKeyDown(KeyCode.Keypad1))
@@ -98,9 +99,15 @@ public class PlayerInventoryManager : InventoryManager
                 slots[i].GetComponent<SlotManager>().updateUI();
                 break;
             }
-
         }
+    }
 
+    public void UpdateAllSlots()
+    {
+        for (int i = 0; i < slots.Count; i++)
+        {
+            slots[i].GetComponent<SlotManager>().updateUI();
+        }
     }
 
 }

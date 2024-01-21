@@ -11,7 +11,6 @@ public class PlayerInventory : MonoBehaviour
 
     public ref InventoryData GetInventory()
     {
-        Debug.Log("Return player inventory...");
         return ref inventory;
     }
 
@@ -45,7 +44,6 @@ public class PlayerInventory : MonoBehaviour
     {
         inventory = new InventoryData("playerInventory");
         inventory.AddSlots(inventorySize);
-        Debug.Log("Created inventory slots");
     }
 
 

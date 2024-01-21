@@ -28,6 +28,20 @@ public class InventoryItem
         }
 
     }
+    public InventoryItem(SO_Item item, int amount)
+    {
+        if (item == null)
+        {
+            this.item = null;
+            this.amount = 0;
+        }
+        else
+        {
+            this.item = item;
+            this.amount = amount;
+        }
+
+    }
 }
 
 public class InventoryManager : MonoBehaviour
@@ -61,7 +75,6 @@ public class InventoryManager : MonoBehaviour
     // Start is called before the first frame update
     public virtual void Start()
     {
-
         raycaster = this.GetComponent<GraphicRaycaster>();
         SetupInventory();
     }

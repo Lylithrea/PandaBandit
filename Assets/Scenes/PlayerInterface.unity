@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 262.38358, g: 325.10843, b: 430.30963, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1079,6 +1079,10 @@ MonoBehaviour:
   - {fileID: 509816307}
   - {fileID: 1186133926}
   - {fileID: 652745082}
+  items:
+  - {fileID: 11400000, guid: fbb6e06c3d7947a4aa452d2ad1f8303a, type: 2}
+  - {fileID: 11400000, guid: 7b8ae19b6a5834e41a86f4dafc008a10, type: 2}
+  - {fileID: 11400000, guid: 107b1e91efd00b64eb76d5e9445a22ab, type: 2}
 --- !u!114 &1651932949
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1095,10 +1099,6 @@ MonoBehaviour:
   inventoryDragParent: {fileID: 771527832}
   draggableItem: {fileID: 2791994070469250195, guid: 5b1a8faafbf5a334e8ab5bd545a9f9be,
     type: 3}
-  items:
-  - {fileID: 11400000, guid: fbb6e06c3d7947a4aa452d2ad1f8303a, type: 2}
-  - {fileID: 11400000, guid: 7b8ae19b6a5834e41a86f4dafc008a10, type: 2}
-  - {fileID: 11400000, guid: 107b1e91efd00b64eb76d5e9445a22ab, type: 2}
 --- !u!114 &1651932950
 MonoBehaviour:
   m_ObjectHideFlags: 0

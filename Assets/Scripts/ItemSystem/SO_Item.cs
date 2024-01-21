@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class SO_Item : ScriptableObject
 {
     public string ItemName;
@@ -9,6 +11,8 @@ public class SO_Item : ScriptableObject
     public int maxStackSize = 1;
     public ItemVariant variant;
 }
+
+[Serializable]
 public enum ItemVariant
 {
     None,

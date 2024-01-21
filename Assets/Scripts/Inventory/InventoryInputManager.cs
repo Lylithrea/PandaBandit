@@ -46,6 +46,7 @@ public class InventoryInputManager : MonoBehaviour
     public void Awake()
     {
         singletonCreation();
+        ItemDatabase.LoadItems();
     }
 
     #endregion
@@ -143,24 +144,14 @@ public class InventoryInputManager : MonoBehaviour
     /// <returns></returns>
     public InventoryManager GetValidInventory(SlotManager slot)
     {
-        Debug.Log("Finding valid inventory for slot: " + slot);
         foreach (InventoryManager inventory in linkedInventories)
         {
-            Debug.Log("Inventory: " + inventory + " with max slots: " + inventory.slots.Count + " and needing: " + slot.slotID);
-/*            if (inventory.inventorySlots.ContainsKey(slot))
-            {
-                return inventory;
-            }*/
             if (inventory.slots.Count > slot.slotID)
             {
-                Debug.Log("Inventory is bigger");
-                Debug.Log("Count: " + inventory.slots.Count + " slot id: " + slot.slotID + " slot: " + slot + " inventory slot: " + inventory.slots[slot.slotID]);
                 if (inventory.slots[slot.slotID] == slot.gameObject)
                 {
-                    Debug.Log("Inventory is same slot");
                     return inventory;
                 }
-
             }
         }
         return null;
@@ -250,6 +241,7 @@ public class InventoryInputManager : MonoBehaviour
     {
         Debug.Log("Input Left Click!" + isDraggingItem);
         SlotManager slot = GetSlotUnderMouse();
+        Debug.Log("Slot: " + slot);
         if (slot == null) return;
 
         if (!isDraggingItem)
