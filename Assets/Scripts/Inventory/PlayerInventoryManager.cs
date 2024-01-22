@@ -37,7 +37,7 @@ public class PlayerInventoryManager : InventoryManager
     }
 
 
-    public override InventoryData GetInventoryData()
+    protected override InventoryData GetInventoryData()
     {
         return PlayerInventory.Instance.GetInventory();
     }
@@ -54,7 +54,7 @@ public class PlayerInventoryManager : InventoryManager
         {
             InventoryInputManager.Instance.LinkInventory(this);
         }
-        if (Input.GetKeyDown(KeyCode.Keypad5))
+/*        if (Input.GetKeyDown(KeyCode.Keypad5))
         {
             inventoryData.PrepareToSaveInventory();
         }
@@ -62,7 +62,7 @@ public class PlayerInventoryManager : InventoryManager
         {
             inventoryData.LoadInventoryDataFromJson();
             UpdateAllSlots();
-        }
+        }*/
 
         if (Input.GetKeyDown(KeyCode.Keypad1))
         {
@@ -102,12 +102,6 @@ public class PlayerInventoryManager : InventoryManager
         }
     }
 
-    public void UpdateAllSlots()
-    {
-        for (int i = 0; i < slots.Count; i++)
-        {
-            slots[i].GetComponent<SlotManager>().updateUI();
-        }
-    }
+
 
 }

@@ -71,7 +71,7 @@ public class InventoryData
 
     public void LoadInventoryDataFromJson()
     {
-        Debug.LogWarning("Loading inventory still needs to be implemented!");
+        Debug.LogWarning("Trying to load inventory: " + fileName);
         if (File.Exists(Application.persistentDataPath + "/InventoryData/" + fileName))
         {
             string json = File.ReadAllText(Application.persistentDataPath + "/InventoryData/" + fileName);
@@ -103,6 +103,9 @@ public class InventoryData
 
     public void PrepareToSaveInventory()
     {
+        Debug.LogWarning("Trying to save inventory: " + fileName);
+
+
         inventoryItems newDatabase = new inventoryItems();
         //newDatabase.items = new inventoryItem[inventoryData.Count];
 
@@ -128,7 +131,6 @@ public class InventoryData
 
     public void SaveInventoryDataToJson(inventoryItems inventory)
     {
-        Debug.LogWarning("Saving inventory still needs to be implemented!");
         CheckIfPathExists("/InventoryData/");
         //string json = JsonUtility.ToJson(inventoryData);
 

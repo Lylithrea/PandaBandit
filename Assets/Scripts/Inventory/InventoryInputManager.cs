@@ -54,7 +54,22 @@ public class InventoryInputManager : MonoBehaviour
     public void Update()
     {
         updateDraggable();
+        if (Input.GetKeyDown(KeyCode.Keypad5))
+        {
+            foreach (InventoryManager manager in linkedInventories)
+            {
+                manager.inventoryData.PrepareToSaveInventory();
+            }
 
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad6))
+        {
+            foreach (InventoryManager manager in linkedInventories)
+            {
+                manager.inventoryData.LoadInventoryDataFromJson();
+                manager.UpdateAllSlots();
+            }
+        }
 
     }
 
@@ -93,7 +108,7 @@ public class InventoryInputManager : MonoBehaviour
         if (validInventory != null)
         {
             //validInventory.inventorySlots[slot] = item;
-            validInventory.GetInventoryData().AddItemToSlot(slot.slotID, item);
+            validInventory.inventoryData.AddItemToSlot(slot.slotID, item);
             slot.updateUI();
         }
     }
@@ -167,7 +182,7 @@ public class InventoryInputManager : MonoBehaviour
         InventoryManager validInventory = GetValidInventory(slot);
         if (validInventory != null)
         {
-            InventoryItem item = validInventory.GetInventoryData().GetItemFromSlot(slot.slotID);
+            InventoryItem item = validInventory.inventoryData.GetItemFromSlot(slot.slotID);
             Debug.Log("Getting item from inventory " + validInventory + " and slot with id: " + slot.slotID + " with item: " + item);
             return item;
         }
@@ -215,7 +230,7 @@ public class InventoryInputManager : MonoBehaviour
 
         if (validInventory != null)
         {
-            validInventory.GetInventoryData().RemoveItemFromSlot(slot.slotID);
+            validInventory.inventoryData.RemoveItemFromSlot(slot.slotID);
         }
     }
 

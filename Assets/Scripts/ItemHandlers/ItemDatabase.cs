@@ -13,7 +13,7 @@ public static class ItemDatabase
     public static void LoadItems()
     {
         Debug.Log("Loading items...");
-        LoadInventoryDataFromJson();
+        LoadItemDatabase();
     }
 
     public static SO_Item GetItem(int itemID)
@@ -31,7 +31,7 @@ public static class ItemDatabase
     }
 
 
-    private static void LoadInventoryDataFromJson()
+    private static void LoadItemDatabase()
     {
         Debug.Log("Loading Items from Json...");
         if (File.Exists(Application.persistentDataPath + "/Items/ItemDatabase"))
@@ -56,6 +56,7 @@ public static class ItemDatabase
             {
                 if (!ItemIDs.ContainsKey(GetItem(database.items[i].itemID)))
                 {
+                    //incase we have multiple items with same id, we only add them once
                     ItemIDs.Add(GetItem(database.items[i].itemID), database.items[i].itemID);
                 }
             }

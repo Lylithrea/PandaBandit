@@ -54,15 +54,18 @@ public class InventoryManager : MonoBehaviour
     public List<GameObject> slots = new List<GameObject>();
     public Dictionary<SlotManager, InventoryItem> inventorySlots = new Dictionary<SlotManager, InventoryItem>();
 
-    public InventoryData localInventoryData;
+    protected InventoryData localInventoryData;
 
     public InventoryData inventoryData {
         get { return GetInventoryData(); }
     }
 
     
-
-    public virtual InventoryData GetInventoryData()
+    /// <summary>
+    /// Returns the correct inventory, as this is different per inherented class.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual InventoryData GetInventoryData()
     {
         if (localInventoryData == null)
         {
@@ -103,7 +106,13 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-
+    public void UpdateAllSlots()
+    {
+        for (int i = 0; i < slots.Count; i++)
+        {
+            slots[i].GetComponent<SlotManager>().updateUI();
+        }
+    }
 
     public virtual void Update()
     {

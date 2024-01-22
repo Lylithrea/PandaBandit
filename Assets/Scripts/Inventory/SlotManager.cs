@@ -6,12 +6,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SlotManager : MonoBehaviour
+public class SlotManager : MonoBehaviour, IPointerEnterHandler
 {
 
     public ItemVariant variant;
 
     public GameObject itemObject;
+    public GameObject starObject;
     public TextMeshProUGUI amountText;
 
     public int amount = 0;
@@ -25,10 +26,14 @@ public class SlotManager : MonoBehaviour
         linkedInventory = inventoryManager;
     }
 
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        starObject.SetActive(false);
+    }
 
     public void updateUI()
     {
-        InventoryItem inventoryItem = linkedInventory.GetInventoryData().GetItemFromSlot(slotID);
+        InventoryItem inventoryItem = linkedInventory.inventoryData.GetItemFromSlot(slotID);
 
         if (inventoryItem != null)
         {
@@ -36,6 +41,7 @@ public class SlotManager : MonoBehaviour
             {
                 amountText.text = "";
                 itemObject.SetActive(false);
+                starObject.SetActive(false);
                 return;
             }
 
@@ -50,12 +56,18 @@ public class SlotManager : MonoBehaviour
                 amountText.text = inventoryItem.amount.ToString();
             }
             amount = inventoryItem.amount;
+            this.gameObject.GetComponent<Animator>().SetTrigger("ItemUpdate");
+            starObject.SetActive(true);
+            Debug.LogWarning("TODO: Add functionality so that the star only shows with new items.");
             return;
         }
         amountText.text = "";
         itemObject.SetActive(false);
+        starObject.SetActive(false);
         return;
 
     }
+
+
 }
 
