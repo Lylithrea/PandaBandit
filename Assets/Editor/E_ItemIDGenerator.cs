@@ -10,10 +10,6 @@ using Unity.VisualScripting;
 public class E_ItemIDGenerator : EditorWindow
 {
 
-    public Dictionary<int, string> savedItems = new Dictionary<int, string>();
-    //public Dictionary<int, string> itemsToSave = new Dictionary<int, string>();
-    List<S_ItemID> itemsToSave = new List<S_ItemID>();
-    public List<string> foundItems = new List<string>();
 
 
     [MenuItem("Window/Item ID Generator")]
@@ -27,11 +23,12 @@ public class E_ItemIDGenerator : EditorWindow
         GUILayout.Label("To generate new item ID's, it will fill empty ID slots, and only add items that aren't included yet.");
         if (GUILayout.Button("Generate ID's"))
         {
-            GenerateIDs();
+            //GenerateIDs();
+            ItemDatabase.SaveItemDatabase();
         }
     }
 
-    public void GenerateIDs()
+/*    public void GenerateIDs()
     {
         Debug.Log("Generating ID's...");
         GatherAllItems();
@@ -145,7 +142,7 @@ public class E_ItemIDGenerator : EditorWindow
             savedItems.Add(database.items[i].itemID, database.items[i].itemPath);
         }
         itemsToSave.AddRange(database.items);
-    }
+    }*/
 
 
 
@@ -154,7 +151,7 @@ public class E_ItemIDGenerator : EditorWindow
 
 }
 
-[Serializable]
+/*[Serializable]
 public class S_ItemDatabase
 {
     public S_ItemID[] items;
@@ -172,4 +169,4 @@ public class S_ItemID
         itemPath = path;
     }
 
-}
+}*/

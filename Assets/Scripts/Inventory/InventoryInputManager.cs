@@ -266,6 +266,13 @@ public class InventoryInputManager : MonoBehaviour
 
             currentItem = new InventoryItem(iventoryItem);
             currentSlot = slot;
+
+            if (iventoryItem.item != null)
+            {
+                iventoryItem.item.hasDiscovered = true;
+                ItemDatabase.UpdateItems();
+                slot.SetStar(false);
+            }
             ClearItemSlot(slot);
             slot.updateUI();
             CreateDraggable();

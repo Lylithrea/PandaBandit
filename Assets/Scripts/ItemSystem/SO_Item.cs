@@ -7,9 +7,11 @@ using UnityEngine;
 public class SO_Item : ScriptableObject
 {
     public string ItemName;
+    public int itemID;
     public Sprite ItemIcon;
     public int maxStackSize = 1;
     public ItemVariant variant;
+    public bool hasDiscovered = false;
 }
 
 [Serializable]

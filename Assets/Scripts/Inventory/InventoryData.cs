@@ -72,9 +72,9 @@ public class InventoryData
     public void LoadInventoryDataFromJson()
     {
         Debug.LogWarning("Trying to load inventory: " + fileName);
-        if (File.Exists(Application.persistentDataPath + "/InventoryData/" + fileName))
+        if (File.Exists(Application.persistentDataPath + "/InventoryData/" + fileName + ".json"))
         {
-            string json = File.ReadAllText(Application.persistentDataPath + "/InventoryData/" + fileName);
+            string json = File.ReadAllText(Application.persistentDataPath + "/InventoryData/" + fileName + ".json");
             inventoryItems newDatabase = JsonUtility.FromJson<inventoryItems>(json);
             ConvertDatabaseToItems(newDatabase);
         }
@@ -136,7 +136,7 @@ public class InventoryData
 
         string json = JsonUtility.ToJson(inventory);
         Debug.Log("Trying to save: " + json);
-        File.WriteAllText(Application.persistentDataPath + "/InventoryData/" + fileName, json);
+        File.WriteAllText(Application.persistentDataPath + "/InventoryData/" + fileName + ".json", json);
     }
 
     private void CheckIfPathExists(string path)

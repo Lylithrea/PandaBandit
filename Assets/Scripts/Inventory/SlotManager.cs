@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SlotManager : MonoBehaviour, IPointerEnterHandler
+public class SlotManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
 
     public ItemVariant variant;
@@ -20,16 +20,31 @@ public class SlotManager : MonoBehaviour, IPointerEnterHandler
 
     private InventoryManager linkedInventory;
 
+    public Color standard;
+    public Color onHover;
+
     public void Setup(InventoryManager inventoryManager)
     {
         Debug.Log("Linking with inventory: " + inventoryManager);
         linkedInventory = inventoryManager;
+        this.GetComponent<Image>().color = standard;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        starObject.SetActive(false);
+        this.GetComponent<Image>().color = onHover;
     }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        this.GetComponent<Image>().color = standard;
+    }
+
+    public void SetStar(bool active)
+    {
+        starObject.SetActive(active);
+    }
+
 
     public void updateUI()
     {
@@ -57,8 +72,12 @@ public class SlotManager : MonoBehaviour, IPointerEnterHandler
             }
             amount = inventoryItem.amount;
             this.gameObject.GetComponent<Animator>().SetTrigger("ItemUpdate");
-            starObject.SetActive(true);
-            Debug.LogWarning("TODO: Add functionality so that the star only shows with new items.");
+            if (!inventoryItem.item.hasDiscovered)
+            {
+                SetStar(true);
+            }
+
+
             return;
         }
         amountText.text = "";

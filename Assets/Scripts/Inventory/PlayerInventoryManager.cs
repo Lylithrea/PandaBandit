@@ -54,15 +54,6 @@ public class PlayerInventoryManager : InventoryManager
         {
             InventoryInputManager.Instance.LinkInventory(this);
         }
-/*        if (Input.GetKeyDown(KeyCode.Keypad5))
-        {
-            inventoryData.PrepareToSaveInventory();
-        }
-        if (Input.GetKeyDown(KeyCode.Keypad6))
-        {
-            inventoryData.LoadInventoryDataFromJson();
-            UpdateAllSlots();
-        }*/
 
         if (Input.GetKeyDown(KeyCode.Keypad1))
         {
