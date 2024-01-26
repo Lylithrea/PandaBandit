@@ -78,9 +78,18 @@
             "id": "1b10f148-7752-4d51-9f4c-af9ce8e6bea0",
             "actions": [
                 {
-                    "name": "LeftClick",
+                    "name": "LeftClickDown",
                     "type": "Button",
                     "id": "2d03614d-0e06-4207-a8b0-9a4f43a84749",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftClickUp",
+                    "type": "Button",
+                    "id": "87014c66-8dc1-4f6d-97a4-fe2755a3f7dd",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -103,17 +112,26 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "ShiftClick",
+                    "type": "Button",
+                    "id": "d5c56665-d237-4047-9e99-ffcc02348425",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
                 {
                     "name": "",
-                    "id": "16a0b134-6c33-448c-8c3a-c80651222396",
+                    "id": "d3bb189d-dd5c-47fb-8cbf-1da1213bfec8",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "",
+                    "interactions": "Press",
                     "processors": "",
-                    "groups": "Main",
-                    "action": "LeftClick",
+                    "groups": "",
+                    "action": "LeftClickDown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -138,6 +156,50 @@
                     "action": "Position",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e629fcb9-868b-4932-89f2-c9bbd0222d0a",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftClickUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Button With One Modifier",
+                    "id": "4f036e54-7a03-45b8-8795-e541619889b9",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShiftClick",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Modifier",
+                    "id": "dcd18244-34d5-4d5b-a82a-c16653220100",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShiftClick",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Button",
+                    "id": "deb81801-5244-4ffb-b2b8-a304777a526c",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShiftClick",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }

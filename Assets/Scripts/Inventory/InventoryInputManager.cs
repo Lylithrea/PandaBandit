@@ -254,6 +254,20 @@ public class InventoryInputManager : MonoBehaviour
     /// </summary>
     public void OnLeftClick()
     {
+        //Handle that if slot underneath is not the same as the initial click dont do anything
+        //Except if we hold the mouse button and start moving to other slots
+
+        //When not dragging item, dont do anything on click
+        //Do everything on movement
+
+
+        //Onmouse click -> get slot underneath mouse
+        //Check if slots under mouse change while release hasnt been called yet
+        //If slots do change while no release, then distribute item over slots
+        //On release on same slot just get the item if no other slots have been hit
+        //If there is no slot under mouse anymore and no other slot has been hit
+
+
         Debug.Log("Input Left Click!" + isDraggingItem);
         SlotManager slot = GetSlotUnderMouse();
         Debug.Log("Slot: " + slot);

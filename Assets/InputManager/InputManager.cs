@@ -38,11 +38,23 @@ public class InputManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public void OnLeftClick(InputValue value)
+    public void OnLeftClickDown(InputValue value)
     {
-        Debug.Log("Left click!");
+        Debug.Log("Left click down!");
         onLeftClick?.Invoke();
+        
     }
+
+    public void OnLeftClickUp(InputValue value)
+    {
+        Debug.Log("Left click up!");
+    }
+
+    public void OnShiftClick(InputValue value)
+    {
+        Debug.Log("Shift click up!");
+    }
+
 
     public void OnRightClick(InputValue value)
     {
