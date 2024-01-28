@@ -150,10 +150,20 @@ public class InventoryInputManager : MonoBehaviour
             else
             {
                 //We pick up the item put it in our hand, and put the our item into the slot
-                InventoryItem tempItem = item;
-                SetItemToSlot(firstSlot, currentItem);
-                currentItem = tempItem;
-                UpdateDraggable();
+                if (item.item == currentItem.item)
+                {
+                    int leftover = AddItemToSlotNew(firstSlot, item, currentItem.amount);
+                    currentItem.amount -= (currentItem.amount - leftover);
+                    UpdateDraggable();
+                }
+                else
+                {
+                    InventoryItem tempItem = item;
+                    SetItemToSlot(firstSlot, currentItem);
+                    currentItem = tempItem;
+                    UpdateDraggable();
+                }
+
             }
 
             //If multiple stored then divide items equally over all slots
