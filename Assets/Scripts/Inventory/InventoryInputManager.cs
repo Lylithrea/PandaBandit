@@ -54,6 +54,8 @@ public class InventoryInputManager : MonoBehaviour
     #endregion
 
     private SlotManager firstSlot = null;
+    private SlotManager firstDragSlot = null;
+    private List<SlotManager> hoveredSlots = new List<SlotManager>();
 
 
     #region InputManagement
@@ -79,6 +81,7 @@ public class InventoryInputManager : MonoBehaviour
             HandleLeftClickUp();
         }
         firstSlot = null;
+        firstDragSlot = null;
     }
 
     private void HandleShiftLeftClickUp()
@@ -106,10 +109,14 @@ public class InventoryInputManager : MonoBehaviour
                     //Check if the slots item is allowed in our old slot
                     if (IsValidInventorySlot(currentSlot, item))
                     {
-                        //We can switch both items
-                        SetItemToSlot(firstSlot, currentItem);
-                        SetItemToSlot(currentSlot, item);
-                        ResetDragItem();
+                        if (GetItemFromSlot(firstDragSlot) == null)
+                        {
+                            //We can switch both items
+                            SetItemToSlot(firstSlot, currentItem);
+                            SetItemToSlot(currentSlot, item);
+                            ResetDragItem();
+                        }
+
                     }
                 }
             }
@@ -122,6 +129,34 @@ public class InventoryInputManager : MonoBehaviour
             if (linkedInventories.Count > 1)
             {
                 //Handle first possible slot to move to, or most valid slot
+                if (firstSlot == mouseSlot)
+                {
+                    InventoryItem item = GetItemFromSlot(firstSlot);
+                    if (item == null) return;
+                    SlotManager emptySlot = GetEmptySlotFromInventory(GetValidInventory(firstSlot), item);
+                    if (emptySlot == null) return;
+                    if (GetItemFromSlot(emptySlot) == null)
+                    {
+                        SetItemToSlot(emptySlot, item);
+                        ClearItemSlot(firstSlot);
+                    }
+                    else
+                    {
+                        int value = item.amount;
+                        Debug.Log("value " + value);
+                        Debug.Log("Adding items to new slot " + item.amount);
+                        int leftover = AddItemToSlotNew(emptySlot, item, value);
+                        Debug.Log("Left over: " + leftover);
+                        Debug.Log("Item Amount 1: " + item.amount);
+                        Debug.Log("value Amount 1: " + value);
+                        Debug.Log("value calc: " + (value - (value - leftover)));
+                        RemoveItemFromSlotNew(firstSlot, value - leftover);
+                        Debug.Log("Item Amount 2: " + item.amount);
+                        Debug.Log("value Amount 2: " + value);
+                        Debug.Log("first slot Amount 2: " + GetItemFromSlot(firstSlot).amount);
+                    }
+
+                }
             }
         }
     }
@@ -177,6 +212,7 @@ public class InventoryInputManager : MonoBehaviour
             {
                 InventoryItem item = GetItemFromSlot(firstSlot);
                 if (item == null) return;
+                if (item.amount == 0) return;
 
                 currentItem = new InventoryItem(item);
                 currentItem.amount = item.amount;
@@ -201,6 +237,10 @@ public class InventoryInputManager : MonoBehaviour
         //Get slot under mouse and store it
         //Wait for other things to happen
         firstSlot = GetSlotUnderMouse();
+        if (!isDraggingItem)
+        {
+            firstDragSlot = GetSlotUnderMouse();
+        }
         Debug.Log("Left Click Down");
     }
 
@@ -226,6 +266,7 @@ public class InventoryInputManager : MonoBehaviour
             HandleRightClickUp();
         }
         firstSlot = null;
+        firstDragSlot = null;
     }
 
     private void HandleShiftRightClickUp()
@@ -375,6 +416,10 @@ public class InventoryInputManager : MonoBehaviour
         //Get slot under mouse and store it
         //Wait for other things to happen
         firstSlot = GetSlotUnderMouse();
+        if (!isDraggingItem)
+        {
+            firstDragSlot = GetSlotUnderMouse();
+        }
         Debug.Log("Right Click Down");
     }
 
@@ -436,6 +481,79 @@ public class InventoryInputManager : MonoBehaviour
     // Data class can be adjusted from outside only methods
     // Visualization goes through inventory manager
     // Inventory links slots to data with numbers
+
+
+    private SlotManager GetEmptySlotFromInventory(InventoryManager exceptedInventory, InventoryItem item = null)
+    {
+        if (linkedInventories.Count < 2) return null;
+        //Checks for an slot with the same variant and with the same item, and if we can add items to it
+        for (int i = 0; i < linkedInventories.Count; i++)
+        {
+            //Not allowed to run when we do not provide an item
+            if (item == null) break;
+            if (linkedInventories[i] == exceptedInventory) continue;
+            //First check if there is an empty slot free of the variant
+            foreach (KeyValuePair<SlotManager, InventoryItem> slot in linkedInventories[i].inventorySlots)
+            {
+                if (slot.Key.variant != item.item.variant) continue;
+                if (slot.Value == null) continue;
+                if (GetItemFromSlot(slot.Key) == null) continue;
+                if (GetItemFromSlot(slot.Key).item != item.item) continue;
+                if (GetItemFromSlot(slot.Key).amount >= item.item.maxStackSize) continue;
+                return slot.Key;
+            }
+        }
+        //Check for an empty slot with same item variant
+        for (int i = 0; i < linkedInventories.Count; i++)
+        {
+            if (item == null) break;
+            if (item.item.variant == ItemVariant.None) break;
+            if (linkedInventories[i] == exceptedInventory) continue;
+
+            //If there isnt, then check if there is an empty slot for the none variant
+            foreach (KeyValuePair<SlotManager, InventoryItem> slot in linkedInventories[i].inventorySlots)
+            {
+                if (slot.Key.variant != item.item.variant) continue;
+                if (slot.Value != null) continue;
+                return slot.Key;
+            }
+        }
+
+
+
+        //Check for an slot with the same item and variant none
+        for (int i = 0; i < linkedInventories.Count; i++)
+        {
+            if (item == null) break;
+            if (linkedInventories[i] == exceptedInventory) continue;
+
+            //If there isnt, then check if there is an empty slot for the none variant
+            foreach (KeyValuePair<SlotManager, InventoryItem> slot in linkedInventories[i].inventorySlots)
+            {
+                if (slot.Key.variant != ItemVariant.None) continue;
+                if (slot.Key == null) continue;
+                if (GetItemFromSlot(slot.Key) == null) continue;
+                if (GetItemFromSlot(slot.Key).item != item.item) continue;
+                if (GetItemFromSlot(slot.Key).amount >= item.item.maxStackSize) continue;
+                return slot.Key;
+            }
+        }
+        //Check for an empty slot with variant none
+        for (int i = 0; i < linkedInventories.Count; i++)
+        {
+            if (linkedInventories[i] == exceptedInventory) continue;
+
+            //If there isnt, then check if there is an empty slot for the none variant
+            foreach (KeyValuePair<SlotManager, InventoryItem> slot in linkedInventories[i].inventorySlots)
+            {
+                if (slot.Key.variant != ItemVariant.None) continue;
+                if (slot.Value != null) continue;
+                return slot.Key;
+            }
+        }
+        //if there isnt, then dont do aything
+        return null;
+    }
 
 
     /// <summary>
@@ -531,6 +649,8 @@ public class InventoryInputManager : MonoBehaviour
             }
             else
             {
+                slotItem.amount = item.item.maxStackSize;
+                SetItemToSlot(slot, slotItem);
                 return Mathf.Abs(overload);
             }
         }
@@ -628,11 +748,17 @@ public class InventoryInputManager : MonoBehaviour
         if (newvalue < 0)
         {
             slotItem.amount = 0;
+            ClearItemSlot(slot);
             slot.updateUI();
             Debug.LogWarning("Removed more items from slot than the slot contained.");
             return Mathf.Abs(newvalue);
         }
+
         slotItem.amount -= amount;
+        if (slotItem.amount == 0)
+        {
+            ClearItemSlot(slot);
+        }
         slot.updateUI();
         return 0;
         
@@ -646,6 +772,7 @@ public class InventoryInputManager : MonoBehaviour
         if (validInventory != null)
         {
             validInventory.inventoryData.RemoveItemFromSlot(slot.slotID);
+            slot.updateUI();
         }
     }
 
