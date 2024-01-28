@@ -5,6 +5,8 @@ using NaughtyAttributes;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using OpenCover.Framework.Model;
+using Unity.VisualScripting;
 
 public class InventoryInputManager : MonoBehaviour
 {
@@ -51,6 +53,331 @@ public class InventoryInputManager : MonoBehaviour
 
     #endregion
 
+    private SlotManager firstSlot = null;
+
+
+    #region InputManagement
+
+    private void ManageLeftClickUp()
+    {
+        if (InputManager.Instance.ShiftPressed)
+        {
+            //No item-> All items in next valid inv slot
+            //Item, empty slot -> Place items in slot
+            //Item, taken slot -> Move taken slot items to old inventory slot if possible, and place this in the slot
+            Debug.Log("Handling Shift Left Click...");
+            HandleShiftLeftClickUp();
+            //If multiple stored then divide items equally over all slots
+            //If 1 slot is stored and mouse isnt over it anymore -> Dont do anything
+        }
+        else
+        {
+            //No item -> All items of slot in hand
+            //Item, empty slot -> Place items in slot
+            //Item, taken slot -> Place items in slot, take taken slot items in hand
+            Debug.Log("Handling Left Click...");
+            HandleLeftClickUp();
+        }
+        firstSlot = null;
+    }
+
+    private void HandleShiftLeftClickUp()
+    {
+        SlotManager mouseSlot = GetSlotUnderMouse();
+        if (mouseSlot == null) return;
+        if (isDraggingItem)
+        {
+            //Check if we are still on the same slot
+            if (firstSlot == mouseSlot)
+            {
+                //Check if its a valid inventory and slot variant
+                if (!IsValidInventorySlot(firstSlot, currentItem)) return;
+
+                InventoryItem item = GetItemFromSlot(firstSlot);
+                if (item == null)
+                {
+                    //If item is null we move our item into the slot
+                    SetItemToSlot(firstSlot, currentItem);
+                    ResetDragItem();
+                }
+                else
+                {
+                    //If there is an item we want to move into we need to check if we can switch
+                    //Check if the slots item is allowed in our old slot
+                    if (IsValidInventorySlot(currentSlot, item))
+                    {
+                        //We can switch both items
+                        SetItemToSlot(firstSlot, currentItem);
+                        SetItemToSlot(currentSlot, item);
+                        ResetDragItem();
+                    }
+                }
+            }
+
+
+        }
+        else
+        {
+            //Needs to have more than 1 inventory as else there isnt another inventory to move to
+            if (linkedInventories.Count > 1)
+            {
+                //Handle first possible slot to move to, or most valid slot
+            }
+        }
+    }
+
+    private void HandleLeftClickUp()
+    {
+        //No item -> All items of slot in hand
+
+        SlotManager mouseSlot = GetSlotUnderMouse();
+        if (mouseSlot == null) return;
+        if (isDraggingItem)
+        {
+            //Item, empty slot -> Place items in slot
+            //Item, taken slot -> Place items in slot, take taken slot items in hand
+
+            //Check if our item can go into the slot
+            if (!IsValidInventorySlot(firstSlot, currentItem)) return;
+
+            InventoryItem item = GetItemFromSlot(firstSlot);
+            if (item == null)
+            {
+                //if the slot is empty just put our item in
+                SetItemToSlot(firstSlot, currentItem);
+                ResetDragItem();
+            }
+            else
+            {
+                //We pick up the item put it in our hand, and put the our item into the slot
+                InventoryItem tempItem = item;
+                SetItemToSlot(firstSlot, currentItem);
+                currentItem = tempItem;
+                UpdateDraggable();
+            }
+
+            //If multiple stored then divide items equally over all slots
+            //If 1 slot is stored and mouse isnt over it anymore -> Dont do anything
+
+        }
+        else
+        {
+            //Make sure we are still on the same slot
+            if (firstSlot == mouseSlot)
+            {
+                InventoryItem item = GetItemFromSlot(firstSlot);
+                if (item == null) return;
+
+                currentItem = new InventoryItem(item);
+                currentItem.amount = item.amount;
+                currentSlot = firstSlot;
+
+                if (item.item != null)
+                {
+                    item.item.hasDiscovered = true;
+                    ItemDatabase.UpdateItems();
+                    firstSlot.SetStar(false);
+                }
+                ClearItemSlot(firstSlot);
+                firstSlot.updateUI();
+                CreateDraggable();
+            }
+
+        }
+    }
+
+    private void ManageLeftClickDown()
+    {
+        //Get slot under mouse and store it
+        //Wait for other things to happen
+        firstSlot = GetSlotUnderMouse();
+        Debug.Log("Left Click Down");
+    }
+
+    private void ManageRightClickUp()
+    {
+        if (InputManager.Instance.ShiftPressed)
+        {
+            //No item -> One of items in hand (can increase count in hand)
+            //Item, empty slot -> Put half stack of items in slot
+            //Item, taken slot -> 
+
+            //If multiple stored then add 1 item to all hovered over slots
+            //If 1 slot is stored and mouse isnt over it anymore -> Dont do anything
+            Debug.Log("Handling Shift Right Click...");
+            HandleShiftRightClickUp();
+        }
+        else
+        {
+            //No item -> Half of items in hand
+            //Item, empty slot -> Put 1 item in slot (can increase with more clicks)
+            //Item, taken slot -> 
+            Debug.Log("Handling Right Click...");
+            HandleRightClickUp();
+        }
+        firstSlot = null;
+    }
+
+    private void HandleShiftRightClickUp()
+    {
+        SlotManager mouseSlot = GetSlotUnderMouse();
+        if (mouseSlot == null) return;
+        if (isDraggingItem)
+        {
+            //Check if our item can go into the slot
+            if (!IsValidInventorySlot(firstSlot, currentItem)) return;
+            InventoryItem item = GetItemFromSlot(firstSlot);
+            if (item == null)
+            {
+                //if the slot is empty put half of our items in
+                int splitAmount = Mathf.CeilToInt((float)currentItem.amount / 2);
+                int leftover = AddItemToSlotNew(firstSlot, currentItem, splitAmount);
+                currentItem.amount -= splitAmount  - leftover;
+                UpdateDraggable();
+                
+            }
+            else
+            {
+                if (item.item == currentItem.item)
+                {
+                    //if the slot is same as our item
+                    int splitAmount = Mathf.CeilToInt((float)currentItem.amount / 2);
+                    int leftover = AddItemToSlotNew(firstSlot, currentItem, splitAmount);
+                    currentItem.amount -= splitAmount - leftover;
+                    UpdateDraggable();
+                }
+                else
+                {
+                    //???
+                }
+            }
+        }
+        else
+        {
+            //No item -> One of items in hand (can increase count in hand)
+
+            //Make sure we are still on the same slot
+            if (firstSlot == mouseSlot)
+            {
+                InventoryItem item = GetItemFromSlot(firstSlot);
+                if (item == null) return;
+
+                if (currentItem != null)
+                {
+                    if (currentItem.item != item.item) return;
+                    if (currentItem.amount < item.item.maxStackSize)
+                    {
+                        currentItem.amount += 1;
+                        updateDraggable();
+                    }
+                }
+                else
+                {
+                    currentItem = new InventoryItem(item);
+                    currentItem.amount = 1;
+                    currentSlot = firstSlot;
+                    CreateDraggable();
+                }
+                
+
+                if (item.item != null)
+                {
+                    item.item.hasDiscovered = true;
+                    ItemDatabase.UpdateItems();
+                    firstSlot.SetStar(false);
+                }
+                //ClearItemSlot(firstSlot);
+                firstSlot.updateUI();
+                
+            }
+        }
+
+
+
+
+
+    }
+
+    private void HandleRightClickUp()
+    {
+        //No item -> Half of items in hand
+        //Item, empty slot -> Put 1 item in slot (can increase with more clicks)
+        //Item, taken slot -> Check if its the same item, if so add 1
+        // If not, then ?
+        SlotManager mouseSlot = GetSlotUnderMouse();
+        if (mouseSlot == null) return;
+        if (isDraggingItem)
+        {
+            //Check if our item can go into the slot
+            if (!IsValidInventorySlot(firstSlot, currentItem)) return;
+
+            InventoryItem item = GetItemFromSlot(firstSlot);
+            if (item == null)
+            {
+                //if the slot is empty put half of our items in
+                int leftover = AddItemToSlotNew(firstSlot, currentItem, 1);
+                currentItem.amount -= 1 - leftover;
+                UpdateDraggable();
+            }
+            else
+            {
+                //Item, taken slot -> 
+                if (item.item == currentItem.item)
+                {
+                    int leftover = AddItemToSlotNew(firstSlot, currentItem, 1);
+                    currentItem.amount -= 1 - leftover;
+                    UpdateDraggable();
+                }
+                else
+                {
+                    //???
+                }
+            }
+        }
+        else
+        {
+            if (firstSlot == mouseSlot)
+            {
+                //No item -> One of items in hand (can increase count in hand)
+                InventoryItem item = GetItemFromSlot(firstSlot);
+                if (item == null) return;
+
+                int splitAmount = Mathf.CeilToInt((float)item.amount / 2);
+                int leftover = RemoveItemFromSlotNew(firstSlot, splitAmount);
+                currentItem = new InventoryItem(item);
+                currentItem.amount = splitAmount - leftover;
+                currentSlot = firstSlot;
+                firstSlot.updateUI();
+                CreateDraggable();
+                
+                
+            }
+
+        }
+
+        //If multiple stored then add 1 item to all hovered over slots
+        //If 1 slot is stored and mouse isnt over it anymore -> Dont do anything
+    }
+
+
+    private void ManageRightClickDown()
+    {
+        //Get slot under mouse and store it
+        //Wait for other things to happen
+        firstSlot = GetSlotUnderMouse();
+        Debug.Log("Right Click Down");
+    }
+
+    private void DragHandler()
+    {
+        //Run while when either left or right click is down
+        //Update consistently -> only when item in hand
+        //Else only once
+    }
+
+    #endregion
+
+
     public void Update()
     {
         updateDraggable();
@@ -78,14 +405,18 @@ public class InventoryInputManager : MonoBehaviour
     public void Start()
     {
         raycaster = this.GetComponent<GraphicRaycaster>();
-        InputManager.Instance.onLeftClick += OnLeftClick;
-        InputManager.Instance.onRightClick += OnRightClick;
+        InputManager.Instance.onLeftClickDown += ManageLeftClickDown;
+        InputManager.Instance.onLeftClickUp += ManageLeftClickUp;
+        InputManager.Instance.onRightClickDown += ManageRightClickDown;
+        InputManager.Instance.onRightClickUp += ManageRightClickUp;
     }
 
     public void OnDisable()
     {
-        InputManager.Instance.onLeftClick -= OnLeftClick;
-        InputManager.Instance.onRightClick -= OnRightClick;
+        InputManager.Instance.onLeftClickDown -= ManageLeftClickDown;
+        InputManager.Instance.onLeftClickUp -= ManageLeftClickUp;
+        InputManager.Instance.onRightClickDown -= ManageRightClickDown;
+        InputManager.Instance.onRightClickUp -= ManageRightClickUp;
     }
 
 
@@ -147,10 +478,55 @@ public class InventoryInputManager : MonoBehaviour
                 currentItem.amount = newStack;
                 SetItemToSlot(slot, currentItem);
             }
-            ResetItem();
+            ResetDragItem();
         }
 
     }
+
+    /// <summary>
+    /// Adds item to a slot, returns 0 if we could add all items, returns the remainder if it reached its max
+    /// </summary>
+    /// <param name="slot"></param>
+    /// <param name="item"></param>
+    /// <param name="amount"></param>
+    /// <returns></returns>
+    private int AddItemToSlotNew(SlotManager slot, InventoryItem item, int amount)
+    {
+        InventoryItem slotItem = GetItemFromSlot(slot);
+
+        //If slot is empty we can just simply add the amount
+        if (slotItem == null)
+        {
+            slotItem = new InventoryItem(item);
+            slotItem.amount = amount;
+            SetItemToSlot(slot, slotItem);
+            return 0;
+        }
+       
+        //Check if there is an item in the slot that does not match our item, we dont do anything
+        if (slotItem.item != item.item) return amount;
+
+        //Else we gotta add the item, but make sure it doesnt go over max count
+        if (slotItem.amount >= item.item.maxStackSize) return amount;
+        else
+        {
+            int overload = item.item.maxStackSize - slotItem.amount - amount;
+            //if overload is higher than 0, it means we could add all items
+            //if overload is below 0 that number is the amount we couldnt add
+            if (overload >= 0)
+            {
+                slotItem.amount += amount;
+                SetItemToSlot(slot, slotItem);
+                return 0;
+            }
+            else
+            {
+                return Mathf.Abs(overload);
+            }
+        }
+    }
+
+
 
     /// <summary>
     /// Gets the correct inventory from the slot
@@ -224,6 +600,35 @@ public class InventoryInputManager : MonoBehaviour
         return null;
     }
 
+
+    private int RemoveItemFromSlotNew (SlotManager slot, int amount, InventoryItem item = null)
+    {
+        InventoryItem slotItem = GetItemFromSlot(slot);
+        if (slotItem == null) return amount;
+        if (item != null)
+        {
+            if (slotItem.item != item.item)
+            {
+                Debug.LogWarning("Trying to remove an item from a slot that does not match.");
+                return amount;
+            }
+        }
+
+        int newvalue = slotItem.amount - amount;
+        if (newvalue < 0)
+        {
+            slotItem.amount = 0;
+            slot.updateUI();
+            Debug.LogWarning("Removed more items from slot than the slot contained.");
+            return Mathf.Abs(newvalue);
+        }
+        slotItem.amount -= amount;
+        slot.updateUI();
+        return 0;
+        
+    }
+
+
     public void ClearItemSlot(SlotManager slot)
     {
         InventoryManager validInventory = GetValidInventory(slot);
@@ -238,7 +643,7 @@ public class InventoryInputManager : MonoBehaviour
     /// <summary>
         /// Resets the temporary data for the drag and drop function
         /// </summary>
-        private void ResetItem()
+        private void ResetDragItem()
     {
         currentSlot = null;
         currentItem = null;
@@ -347,7 +752,7 @@ public class InventoryInputManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets the first slot under the mouse
+    /// Gets the first slot under the mouse, if it doesnt find one, it will return null
     /// </summary>
     /// <returns></returns>
     public SlotManager GetSlotUnderMouse()
@@ -389,6 +794,18 @@ public class InventoryInputManager : MonoBehaviour
         isDraggingItem = true;
     }
 
+    private void UpdateDraggable()
+    {
+        if (dragItem == null) return;
+        if (currentItem.amount <= 0)
+        {
+            ResetDragItem();
+            return;
+        }
+        dragItem.GetComponent<ItemHandler>().SetItem(currentItem);
+        dragItem.GetComponent<ItemHandler>().UpdateUI();
+    }
+
     /// <summary>
     /// Updates the position of the draggable to the mouse position
     /// </summary>
@@ -425,6 +842,14 @@ public class InventoryInputManager : MonoBehaviour
         }
     }
 
+    private bool IsValidInventorySlot(SlotManager slot, InventoryItem item)
+    {
+        if(GetValidInventory(slot) == null) return false;
+        if(!IsValidItemType(slot, item)) return false;
+        return true;
+    }
+
+
     /// <summary>
     /// Check if its possible to switch the 2 items in the slots
     /// </summary>
@@ -440,7 +865,7 @@ public class InventoryInputManager : MonoBehaviour
             {
                 SetItemToSlot(currentSlot, GetItemFromSlot(newSlot));
                 SetItemToSlot(newSlot, currentItem);
-                ResetItem();
+                ResetDragItem();
                 return true;
             }
         }
@@ -474,7 +899,7 @@ public class InventoryInputManager : MonoBehaviour
         if (slotItem == null || slotItem.amount <= 0)
         {
             SetItemToSlot(newSlot, currentItem);
-            ResetItem();
+            ResetDragItem();
             return false;
         }
         return true;
@@ -512,7 +937,7 @@ public class InventoryInputManager : MonoBehaviour
         {
             SetItemToSlot(currentSlot, currentItem);
         }
-        ResetItem();
+        ResetDragItem();
     }
 
     /// <summary>

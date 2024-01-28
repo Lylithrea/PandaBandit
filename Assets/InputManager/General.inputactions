@@ -96,9 +96,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "RightClick",
+                    "name": "RightClickDown",
                     "type": "Button",
                     "id": "73c5ef55-0029-4da4-93da-a27693e73473",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightClickUp",
+                    "type": "Button",
+                    "id": "4827a7e0-60a3-4a73-9afb-0f221057e012",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -114,13 +123,13 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "ShiftClick",
-                    "type": "Button",
-                    "id": "d5c56665-d237-4047-9e99-ffcc02348425",
+                    "name": "Shift",
+                    "type": "Value",
+                    "id": "4d7b93ff-66e4-42ba-a748-1752a9345487",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -139,10 +148,10 @@
                     "name": "",
                     "id": "624faf0d-c07c-4af5-b963-97233a41b881",
                     "path": "<Mouse>/rightButton",
-                    "interactions": "",
+                    "interactions": "Press",
                     "processors": "",
                     "groups": "Main",
-                    "action": "RightClick",
+                    "action": "RightClickDown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -169,37 +178,26 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "Button With One Modifier",
-                    "id": "4f036e54-7a03-45b8-8795-e541619889b9",
-                    "path": "ButtonWithOneModifier",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ShiftClick",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Modifier",
-                    "id": "dcd18244-34d5-4d5b-a82a-c16653220100",
+                    "name": "",
+                    "id": "791645ea-bcf7-41cf-a4f1-7556428fbdcf",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ShiftClick",
+                    "action": "Shift",
                     "isComposite": false,
-                    "isPartOfComposite": true
+                    "isPartOfComposite": false
                 },
                 {
-                    "name": "Button",
-                    "id": "deb81801-5244-4ffb-b2b8-a304777a526c",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
+                    "name": "",
+                    "id": "35cde434-ea3e-4301-a92c-a5abc913ed93",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "Press(behavior=1)",
                     "processors": "",
-                    "groups": "",
-                    "action": "ShiftClick",
+                    "groups": "Main",
+                    "action": "RightClickUp",
                     "isComposite": false,
-                    "isPartOfComposite": true
+                    "isPartOfComposite": false
                 }
             ]
         }

@@ -24,7 +24,7 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 4
+  m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
@@ -250,6 +250,18 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 73c5ef55-0029-4da4-93da-a27693e73473
     m_ActionName: UI/RightClick[/Mouse/rightButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 87014c66-8dc1-4f6d-97a4-fe2755a3f7dd
+    m_ActionName: UI/LeftClickUp[/Mouse/leftButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: bd4af2d7-1a38-4ce4-8cfb-3afd068df0cd
+    m_ActionName: UI/Position[/Mouse/position]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: d5c56665-d237-4047-9e99-ffcc02348425
+    m_ActionName: UI/ShiftClick[/Keyboard/shift,/Mouse/leftButton]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Main
   m_DefaultActionMap: UI
