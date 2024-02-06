@@ -81,6 +81,7 @@ public class InventoryInputManager : MonoBehaviour
             Debug.Log("Handling Left Click...");
             HandleLeftClickUp();
         }
+        ResetDragHandler();
         firstSlot = null;
     }
 
@@ -304,8 +305,8 @@ public class InventoryInputManager : MonoBehaviour
             Debug.Log("Handling Right Click...");
             HandleRightClickUp();
         }
+        ResetDragHandler();
         firstSlot = null;
-        firstDragSlot = null;
     }
 
     private void HandleShiftRightClickUp()
@@ -518,6 +519,16 @@ public class InventoryInputManager : MonoBehaviour
         ResetDragList();
         isLeftMouseDown = false;
         isRightMouseDown = false;
+        hoveredIndex = 0;
+        UpdateDraggable(true);
+    }
+
+    int hoveredIndex = 0;
+
+
+    private void AddItemsToSlots(int totalAmount)
+    {
+        for (int )
     }
 
     private void DragHandler(bool isLeft)
@@ -525,6 +536,7 @@ public class InventoryInputManager : MonoBehaviour
         //Run while when either left or right click is down
         //Update consistently -> only when item in hand
         //Else only once
+        Debug.Log("Dragging... " + isLeft);
         AddSlotToDragList(GetSlotUnderMouse());
 
         if (hoveredSlots.Count < 2) return;
@@ -532,20 +544,36 @@ public class InventoryInputManager : MonoBehaviour
         if (isLeft)
         {
             //divide everything equally
+            //when a slot fills up to max, we add the leftover over all slots
+            //remove all added items from slot when adding a new slot to the list
+            for (int i = hoveredIndex; i < hoveredSlots.Count; i++)
+            {
+                if (currentItem.amount > 0)
+                {
+                    InventoryItem item = new InventoryItem(currentItem);
+                    item.amount = 1;
+                    currentItem.amount--;
+                    currentItem.amount += AddItemToSlotNew(hoveredSlots[i], item, 1);
+                }
+                hoveredIndex++;
+            }
+            if (currentItem.amount < 0) currentItem.amount = 0;
+            UpdateDraggable(false);
         }
         else
         {
             //only add 1
-            for(int i = 0; i < hoveredSlots.Count; i++)
+            for (int i = hoveredIndex; i < hoveredSlots.Count; i++)
             {
-                if (i < currentItem.amount)
+                if (currentItem.amount > 0)
                 {
                     InventoryItem item = new InventoryItem(currentItem);
                     item.amount = 1;
-                    SetItemToSlot(hoveredSlots[i], item);
+                    currentItem.amount--;
+                    currentItem.amount += AddItemToSlotNew(hoveredSlots[i], item, 1);
                 }
+                hoveredIndex++;
             }
-            currentItem.amount = startItemAmount - hoveredSlots.Count;
             if (currentItem.amount < 0) currentItem.amount = 0;
             UpdateDraggable(false);
         }
