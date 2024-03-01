@@ -517,9 +517,11 @@ public class InventoryInputManager : MonoBehaviour
     {
         startItemAmount = 0;
         ResetDragList();
+        currentHoveredSlots = 0;
         isLeftMouseDown = false;
         isRightMouseDown = false;
         hoveredIndex = 0;
+        currentDivision = 0;
         UpdateDraggable(true);
     }
 
@@ -528,35 +530,53 @@ public class InventoryInputManager : MonoBehaviour
 
     private void AddItemsToSlots(int totalAmount)
     {
-        for (int )
+        //for (int )
+        
+        //gotta store item amount in hand
+        //then we share it equally over all the slots
+
+        //try to add as much as you can, whatever is left over store it
+        //then divide lefterover (from slots but also hand) over slots again
+        //then keep repeating until its not possible anymore,
+        //whatever then is leftover, add it to hand
     }
+
+    int currentHoveredSlots = 0;
+    int currentDivision = 0;
 
     private void DragHandler(bool isLeft)
     {
         //Run while when either left or right click is down
         //Update consistently -> only when item in hand
         //Else only once
+
         Debug.Log("Dragging... " + isLeft);
         AddSlotToDragList(GetSlotUnderMouse());
 
         if (hoveredSlots.Count < 2) return;
-        
+        if (currentHoveredSlots == hoveredSlots.Count) return;
+        currentHoveredSlots = hoveredSlots.Count;
         if (isLeft)
         {
             //divide everything equally
             //when a slot fills up to max, we add the leftover over all slots
             //remove all added items from slot when adding a new slot to the list
-            for (int i = hoveredIndex; i < hoveredSlots.Count; i++)
+            int newDivision = Mathf.FloorToInt(startItemAmount / hoveredSlots.Count);
+            for (int i = 0; i < hoveredSlots.Count; i++)
             {
+                InventoryItem item = new InventoryItem(currentItem);
+                RemoveItemFromSlotNew(hoveredSlots[i], currentDivision - newDivision);
+                if (i < hoveredIndex) return;
                 if (currentItem.amount > 0)
                 {
-                    InventoryItem item = new InventoryItem(currentItem);
-                    item.amount = 1;
-                    currentItem.amount--;
-                    currentItem.amount += AddItemToSlotNew(hoveredSlots[i], item, 1);
+                    //InventoryItem item = new InventoryItem(currentItem);
+                    item.amount = Mathf.FloorToInt(startItemAmount / hoveredSlots.Count);
+                    currentItem.amount -= item.amount;
+                    currentItem.amount += AddItemToSlotNew(hoveredSlots[i], item, item.amount);
                 }
                 hoveredIndex++;
             }
+            currentDivision = Mathf.FloorToInt(startItemAmount / hoveredSlots.Count);
             if (currentItem.amount < 0) currentItem.amount = 0;
             UpdateDraggable(false);
         }
