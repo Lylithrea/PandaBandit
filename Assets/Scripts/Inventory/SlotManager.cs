@@ -1,74 +1,90 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class SlotManager : MonoBehaviour
+public class SlotManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
 
     public ItemVariant variant;
-    public SO_Item item;
-    public int currentAmount;
-    public Transform iconSlotTransform;
 
+    public GameObject itemObject;
+    public GameObject starObject;
+    public TextMeshProUGUI amountText;
 
-    //inventory data needs to be serialized eventually
+    public int amount = 0;
+    public int slotID = 0;
 
-    public void Start()
+    private InventoryManager linkedInventory;
+
+    public Color standard;
+    public Color onHover;
+
+    public void Setup(InventoryManager inventoryManager)
     {
-        if (iconSlotTransform.childCount != 0)
-        {
-            item = iconSlotTransform.GetComponentInChildren<ItemHandler>().item;
-        }
+        Debug.Log("Linking with inventory: " + inventoryManager);
+        linkedInventory = inventoryManager;
+        this.GetComponent<Image>().color = standard;
     }
 
-    public void RemoveItem(SO_Item newItem, int amount)
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        currentAmount -= amount;
-        if (currentAmount == 0)
-        {
-            item = null;
-        }
-        if (currentAmount < 0)
-        {
-            Debug.LogWarning("You somehow managed to remove more items than the slot contains...");
-        }
+        this.GetComponent<Image>().color = onHover;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        this.GetComponent<Image>().color = standard;
+    }
+
+    public void SetStar(bool active)
+    {
+        starObject.SetActive(active);
     }
 
 
-    public bool TryToAddItem(SO_Item newItem, int amount)
+    public void updateUI()
     {
-        if (variant == ItemVariant.None || variant == newItem.variant)
+        InventoryItem inventoryItem = linkedInventory.inventoryData.GetItemFromSlot(slotID);
+
+        if (inventoryItem != null)
         {
-            if (item == null)
+            if (inventoryItem.amount == 0)
             {
-                Debug.Log("Item slot is empty and has matching variant");
-                AddItem(newItem);
-                return true;
+                amountText.text = "";
+                itemObject.SetActive(false);
+                starObject.SetActive(false);
+                return;
             }
-            else if( item == newItem)
+
+            itemObject.SetActive(true);
+            itemObject.GetComponent<Image>().sprite = inventoryItem.item.ItemIcon;
+            if (inventoryItem.item.maxStackSize == 1)
             {
-                if (item.maxStackSize > currentAmount)
-                {
-                    //check we can stack all items or part of it
-                    Debug.Log("Item slot has the same item and isnt fully stacked yet");
-                    AddItem(newItem);
-                    return true;
-                }
-                //switch items?
-                Debug.Log("Item slot has the same item but is full");
-                return false;
+                amountText.text = "";
             }
+            else
+            {
+                amountText.text = inventoryItem.amount.ToString();
+            }
+            amount = inventoryItem.amount;
+            this.gameObject.GetComponent<Animator>().SetTrigger("ItemUpdate");
+            if (!inventoryItem.item.hasDiscovered)
+            {
+                SetStar(true);
+            }
+
+
+            return;
         }
-        Debug.Log("The variant does not match");
+        amountText.text = "";
+        itemObject.SetActive(false);
+        starObject.SetActive(false);
+        return;
 
-        return false;
-    }
-
-    private void AddItem(SO_Item newItem)
-    {
-        Debug.Log("Added item");
-        item = newItem;
     }
 
 

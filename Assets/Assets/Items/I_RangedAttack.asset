@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: I_RangedAttack
   m_EditorClassIdentifier: 
   ItemName: 
+  itemID: 2
   ItemIcon: {fileID: 21300000, guid: 1483e65d894775f4a92afdcb9b9eff41, type: 3}
-  maxStackSize: 1
-  variant: 0
+  maxStackSize: 10
+  variant: 4
+  hasDiscovered: 1
   hasUpgrades: 0
   EquipmentDamageList:
   - damageType: 0

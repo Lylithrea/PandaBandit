@@ -3,30 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
-public class ItemHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class ItemHandler : MonoBehaviour
 {
 
     public SO_Item item;
+    public int amount;
 
-    public void Start()
+    public Image itemIcon;
+    public TextMeshProUGUI itemAmount;
+
+
+    public void UpdateUI()
     {
-        GetComponent<Image>().sprite = item.ItemIcon;
+        itemIcon.sprite = item.ItemIcon;
+
+        itemAmount.text = amount.ToString();
+        if (item.maxStackSize == 1) itemAmount.text = "";
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    public void SetItem(InventoryItem item)
     {
-        Debug.Log("Started dragging");
+        this.item = item.item;
+        this.amount = item.amount;
     }
 
-    public void OnDrag(PointerEventData eventData)
-    {
-        Debug.Log("Dragging");
-    }
 
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        Debug.Log("Ended dragging");
-    }
 
 }
