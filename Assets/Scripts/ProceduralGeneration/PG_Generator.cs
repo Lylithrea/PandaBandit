@@ -20,6 +20,20 @@ public class PG_Generator : MonoBehaviour
     public List<GameObject> lowestPossibilitiesTile = new List<GameObject>();
     public List<GameObject> uncompletedTiles = new List<GameObject>();
 
+
+    [Button]
+    public void RemoveTiles()
+    {
+        foreach (GameObject tile in generatedTiles)
+        {
+            DestroyImmediate(tile);
+        }
+        generatedTiles.Clear();
+        uncompletedTiles.Clear();
+        lowestPossibilitiesTile.Clear();
+    }
+
+
     [Button]
     public void Generate()
     {
