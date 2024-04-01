@@ -20,10 +20,22 @@ public class PG_AdvGenerator : MonoBehaviour
 
     public List<GameObject> lowestPossibilitiesTile = new List<GameObject>();
     public List<GameObject> uncompletedTiles = new List<GameObject>();
+    public List<GameObject> neighbouringTiles = new List<GameObject>();
 
     public static PG_AdvGenerator instance;
 
-    
+    public List<PG_AdvTile> startTiles = new List<PG_AdvTile>();
+    public List<PG_AdvTile> endTiles = new List<PG_AdvTile>();
+    public int minLength = 4;
+    public int maxLength = 6;
+    [Foldout("Start Tile Settings")] public int minXPosition = 0;
+    [Foldout("Start Tile Settings")] public int maxXPosition = 1;
+    [Foldout("Start Tile Settings")] public int minYPosition = 0;
+    [Foldout("Start Tile Settings")] public int maxYPosition = 1;
+
+    private PG_TileManager startTilesManager;
+    private List<PG_TileManager> endTilesManagers = new List<PG_TileManager>();
+
     public void Awake()
     {
         if (instance == null)
@@ -49,18 +61,15 @@ public class PG_AdvGenerator : MonoBehaviour
         generatedTiles.Clear();
         uncompletedTiles.Clear();
         lowestPossibilitiesTile.Clear();
+        startTilesManager = null;
+        endTilesManagers.Clear();
+        neighbouringTiles.Clear();
     }
 
     [Button]
     public void Generate()
     {
-        foreach (GameObject tile in generatedTiles)
-        {
-            DestroyImmediate(tile);
-        }
-        generatedTiles.Clear();
-        uncompletedTiles.Clear();
-        lowestPossibilitiesTile.Clear();
+        RemoveTiles();
 
         for (int i = 0; i < columns; i++)
         {
@@ -70,7 +79,6 @@ public class PG_AdvGenerator : MonoBehaviour
                 SetupTile(newTile, i, j);
 
                 generatedTiles.Add(newTile);
-                lowestPossibilitiesTile.Add(newTile);
                 uncompletedTiles.Add(newTile);
             }
         }
@@ -78,6 +86,8 @@ public class PG_AdvGenerator : MonoBehaviour
         {
             generatedTiles[j].GetComponent<PG_TileManager>().UpdateTile();
         }
+
+        SortTiles();
     }
 
     private void SetupTile(GameObject tile, int col, int row)
@@ -107,9 +117,27 @@ public class PG_AdvGenerator : MonoBehaviour
         {
             if (generatedTiles.Count == 0) return;
 
+            if (startTilesManager == null)
+            {
+                int randomStartTile = Random.Range(0, startTiles.Count);
+
+                lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().SetTile();
+
+                neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().row));
+                neighbouringTiles.Remove(lowestPossibilitiesTile[randomStartTile]);
+
+                updateSurroundingTiles(lowestPossibilitiesTile[randomStartTile]);
+
+                uncompletedTiles.Remove(lowestPossibilitiesTile[randomStartTile]);
+                return;
+            }
+
             int randomTile = Random.Range(0, lowestPossibilitiesTile.Count);
 
             lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().SetTile();
+
+            neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().row));
+            neighbouringTiles.Remove(lowestPossibilitiesTile[randomTile]);
 
             updateSurroundingTiles(lowestPossibilitiesTile[randomTile]);
 
@@ -167,6 +195,36 @@ public class PG_AdvGenerator : MonoBehaviour
     {
         lowestPossibilitiesTile.Clear();
         lowestValue = 100;
+        if (startTilesManager == null)
+        {
+            int startX = Random.Range(minXPosition, maxXPosition);
+            int startY = Random.Range(minYPosition, maxYPosition);
+            GameObject startTile = generatedTiles[(startX - 1) * columns + startY];
+            lowestPossibilitiesTile.Add(startTile);
+            neighbouringTiles.Add(startTile);
+            return;
+        }
+
+        foreach (GameObject neighbour in neighbouringTiles)
+        {
+            if (lowestPossibilitiesTile.Count == 0)
+            {
+                lowestPossibilitiesTile.Add(neighbour);
+                lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+            }
+            if (neighbour.GetComponent<PG_TileManager>().entropy == lowestValue)
+            {
+                lowestPossibilitiesTile.Add(neighbour);
+            }
+            if (neighbour.GetComponent<PG_TileManager>().entropy < lowestValue)
+            {
+                lowestPossibilitiesTile.Clear();
+                lowestPossibilitiesTile.Add(neighbour);
+                lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+            }
+        }
+        return;
+
         foreach (GameObject uncompletedTile in uncompletedTiles)
         {
             if (lowestPossibilitiesTile.Count == 0)

@@ -224,6 +224,23 @@ public class PG_TileManager : MonoBehaviour
         tileObj.transform.Rotate(new Vector3(0, tileRotations[randomTile].rotation * -90, 0));
     }
 
+    public void SetStartTile()
+    {
+        entropy = 0;
+        int randomTile = Random.Range(0, tileRotations.Count);
 
+        //PG_AdvTile newTile = randomTiles[randomTile];
+        var newTile = tileRotations[randomTile].tile;
+        this.tile = newTile;
+        this.rotation = tileRotations[randomTile].rotation;
+
+        foreach (Transform child in this.transform)
+        {
+            DestroyImmediate(child.gameObject);
+        }
+        GameObject tileObj = Instantiate(newTile.GetTile(), this.transform);
+
+        tileObj.transform.Rotate(new Vector3(0, tileRotations[randomTile].rotation * -90, 0));
+    }
 
 }
