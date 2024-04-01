@@ -2,15 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "ProceduralGeneration/Advanced Tile")]
+
 public class PG_AdvTile : ScriptableObject
 {
-    public string tileName;
-    public GameObject tile;
-    public TileTypes sideA;
-    public TileTypes sideB;
-    public TileTypes sideC;
-    public TileTypes sideD;
+    protected string tileName;
+    public GameObject visualObject;
+
+    public virtual TileTypes GetSide(int side)
+    {
+        return TileTypes.None;
+    }
+
+    public virtual GameObject GetTile()
+    {
+        return null;
+    }
+
+    public virtual string TileName()
+    {
+        return tileName;
+    }
 }
 
 
@@ -19,5 +30,7 @@ public enum TileTypes
     None,
     Forest,
     Grass,
-    Water
+    Water,
+    Solid,
+    Empty
 }

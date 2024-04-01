@@ -109,13 +109,7 @@ public class PG_AdvGenerator : MonoBehaviour
 
             int randomTile = Random.Range(0, lowestPossibilitiesTile.Count);
 
-            int random = Random.Range(0, lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().possibleTiles.Count);
-
-            Debug.Log("Random : " + random);
-            Debug.Log("Random Count: " + lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().possibleTiles.Count);
-
-            PG_AdvTile tile = lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().possibleTiles[random];
-            lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().SetTile(tile);
+            lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().SetTile();
 
             updateSurroundingTiles(lowestPossibilitiesTile[randomTile]);
 
@@ -130,8 +124,6 @@ public class PG_AdvGenerator : MonoBehaviour
     {
         int col = tile.GetComponent<PG_TileManager>().col;
         int row = tile.GetComponent<PG_TileManager>().row;
-
-        Debug.Log("updating tile position: " + col + ", " + row);
 
 
         if (col - 1 >= 0)
@@ -200,8 +192,6 @@ public class PG_AdvGenerator : MonoBehaviour
     {
         List<GameObject> neighbours = new List<GameObject>();
 
-        Debug.Log("Out position: " + col + ", " + row);
-
         if (col - 1 >= 0)
         {
             neighbours.Add(generatedTiles[(col - 1) * columns + row]);
@@ -227,48 +217,38 @@ public class PG_AdvGenerator : MonoBehaviour
     {
         List<TileTypes> neighbours = new List<TileTypes>();
 
-        Debug.Log("Our position: " + col + ", " + row);
-
 
         if (row + 1 < rows)
         {
-            Debug.Log("Inside boundaries, under row");
             neighbours.Add(generatedTiles[col * columns + (row + 1)].GetComponent<PG_TileManager>().GetSide(col, row));
         }
         else
         {
-            Debug.Log("Outside boundaries, over row");
-            neighbours.Add(TileTypes.None);
+            neighbours.Add(TileTypes.Empty);
         }
         if (col + 1 < columns)
         {
-            Debug.Log("Inside boundaries, under col");
             neighbours.Add(generatedTiles[(col + 1) * columns + row].GetComponent<PG_TileManager>().GetSide(col, row));
         }
         else
         {
-            Debug.Log("Outside boundaries, over col");
-            neighbours.Add(TileTypes.None);
+            neighbours.Add(TileTypes.Empty);
         }
         if (row - 1 >= 0)
         {
-            Debug.Log("Inside boundaries, over row");
             neighbours.Add(generatedTiles[col * columns + (row - 1)].GetComponent<PG_TileManager>().GetSide(col, row));
         }
         else 
         {
-            Debug.Log("Outside boundaries, under row");
-            neighbours.Add(TileTypes.None);
+            neighbours.Add(TileTypes.Empty);
         }
         if (col - 1 >= 0)
         {
-            Debug.Log("Inside boundaries, over col");
             neighbours.Add(generatedTiles[(col - 1) * columns + row].GetComponent<PG_TileManager>().GetSide(col, row));
         }
         else
         {
-            Debug.Log("Outside boundaries, under col");
-            neighbours.Add(TileTypes.None);
+            neighbours.Add(TileTypes.Empty);
         }
 
         return neighbours;
