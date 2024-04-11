@@ -19,6 +19,7 @@ public class PG_AdvGenerator : MonoBehaviour
     public List<GameObject> generatedTiles = new List<GameObject>();
 
     public List<GameObject> lowestPossibilitiesTile = new List<GameObject>();
+    public List<GameObject> connectedToStartTile = new List<GameObject>();
     public List<GameObject> uncompletedTiles = new List<GameObject>();
     public List<GameObject> neighbouringTiles = new List<GameObject>();
 
@@ -117,26 +118,37 @@ public class PG_AdvGenerator : MonoBehaviour
         {
             if (generatedTiles.Count == 0) return;
 
+            //generate starttile
             if (startTilesManager == null)
             {
+                Debug.Log("Creating start tile!");
                 int randomStartTile = Random.Range(0, startTiles.Count);
 
+                lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().SetStartTile(startTiles);
                 lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().SetTile();
+                lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().isConnectedToStart = true;
 
-                neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().row));
+                //neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().row));
+                AddRange(GetNeighbours(lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().row));
                 neighbouringTiles.Remove(lowestPossibilitiesTile[randomStartTile]);
 
                 updateSurroundingTiles(lowestPossibilitiesTile[randomStartTile]);
 
                 uncompletedTiles.Remove(lowestPossibilitiesTile[randomStartTile]);
+                startTilesManager = lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>();
+                SortTiles();
                 return;
             }
+            Debug.Log("Creating normal tile!");
 
             int randomTile = Random.Range(0, lowestPossibilitiesTile.Count);
 
             lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().SetTile();
 
-            neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().row));
+            //neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().row));
+
+            AddRange(GetNeighbours(lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().row));
+
             neighbouringTiles.Remove(lowestPossibilitiesTile[randomTile]);
 
             updateSurroundingTiles(lowestPossibilitiesTile[randomTile]);
@@ -144,6 +156,21 @@ public class PG_AdvGenerator : MonoBehaviour
             uncompletedTiles.Remove(lowestPossibilitiesTile[randomTile]);
 
             SortTiles();
+        }
+
+    }
+
+
+    public void AddRange(List<GameObject> neighbours)
+    {
+        foreach (GameObject neighbour in neighbours)
+        {
+            if (neighbouringTiles.Contains(neighbour)) continue;
+            if (uncompletedTiles.Contains(neighbour))
+            {
+                neighbouringTiles.Add(neighbour);
+            }
+
         }
 
     }
@@ -193,6 +220,7 @@ public class PG_AdvGenerator : MonoBehaviour
     public float lowestValue = 100;
     public void SortTiles()
     {
+        connectedToStartTile.Clear();
         lowestPossibilitiesTile.Clear();
         lowestValue = 100;
         if (startTilesManager == null)
@@ -244,6 +272,9 @@ public class PG_AdvGenerator : MonoBehaviour
             }
         }
     }
+
+
+
 
 
     public List<GameObject> GetNeighbours(int col, int row)

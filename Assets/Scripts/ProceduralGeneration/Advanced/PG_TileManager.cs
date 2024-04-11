@@ -21,6 +21,7 @@ public class PG_TileManager : MonoBehaviour
     public int col = 0, row = 0;
     public int rotation = 0;
     public PG_AdvTile tile = null;
+    public bool isConnectedToStart = false;
 
     public List<PG_AdvTile> possibleTiles = new List<PG_AdvTile>();
     public Dictionary<PG_AdvTile, int> possibleRotTiles = new Dictionary<PG_AdvTile, int>();
@@ -224,9 +225,36 @@ public class PG_TileManager : MonoBehaviour
         tileObj.transform.Rotate(new Vector3(0, tileRotations[randomTile].rotation * -90, 0));
     }
 
-    public void SetStartTile()
+    public void SetStartTile(List<PG_AdvTile> startTiles)
     {
         entropy = 0;
+
+        possibleTiles.Clear();
+        possibleTiles.AddRange(startTiles);
+        UpdateTile();
+        int randomTile = Random.Range(0, tileRotations.Count);
+
+        //PG_AdvTile newTile = randomTiles[randomTile];
+        var newTile = tileRotations[randomTile].tile;
+        this.tile = newTile;
+        this.rotation = tileRotations[randomTile].rotation;
+
+        foreach (Transform child in this.transform)
+        {
+            DestroyImmediate(child.gameObject);
+        }
+        GameObject tileObj = Instantiate(newTile.GetTile(), this.transform);
+
+        tileObj.transform.Rotate(new Vector3(0, tileRotations[randomTile].rotation * -90, 0));
+    }
+
+    public void SetEndTile(List<PG_AdvTile> endTiles)
+    {
+        entropy = 0;
+
+        possibleTiles.Clear();
+        possibleTiles.AddRange(endTiles);
+        UpdateTile();
         int randomTile = Random.Range(0, tileRotations.Count);
 
         //PG_AdvTile newTile = randomTiles[randomTile];
