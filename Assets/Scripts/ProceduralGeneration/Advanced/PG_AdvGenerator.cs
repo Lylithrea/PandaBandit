@@ -27,6 +27,7 @@ public class PG_AdvGenerator : MonoBehaviour
 
     public List<PG_AdvTile> startTiles = new List<PG_AdvTile>();
     public List<PG_AdvTile> endTiles = new List<PG_AdvTile>();
+    public List<PG_AdvTile> backupTiles = new List<PG_AdvTile>();
     public int minLength = 4;
     public int maxLength = 6;
     [Foldout("Start Tile Settings")] public int minXPosition = 0;
@@ -116,46 +117,94 @@ public class PG_AdvGenerator : MonoBehaviour
     {
         for (int i = 0; i < steps; i++)
         {
-            if (generatedTiles.Count == 0) return;
-
-            //generate starttile
-            if (startTilesManager == null)
+            try
             {
-                Debug.Log("Creating start tile!");
-                int randomStartTile = Random.Range(0, startTiles.Count);
+                if (generatedTiles.Count == 0) return;
 
-                lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().SetStartTile(startTiles);
-                lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().SetTile();
-                lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().isConnectedToStart = true;
+                //generate starttile
+                if (startTilesManager == null)
+                {
+                    Debug.Log("Creating start tile!");
+                    int randomStartTile = Random.Range(0, startTiles.Count);
 
-                //neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().row));
-                AddRange(GetNeighbours(lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().row));
-                neighbouringTiles.Remove(lowestPossibilitiesTile[randomStartTile]);
+                    lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().SetStartTile(startTiles);
+                    lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().SetTile();
+                    lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().isConnectedToStart = true;
+                    SetConnectedToStart(lowestPossibilitiesTile[randomStartTile]);
 
-                updateSurroundingTiles(lowestPossibilitiesTile[randomStartTile]);
+                    //neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().row));
+                    AddRange(GetNeighbours(lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>().row));
+                    neighbouringTiles.Remove(lowestPossibilitiesTile[randomStartTile]);
 
-                uncompletedTiles.Remove(lowestPossibilitiesTile[randomStartTile]);
-                startTilesManager = lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>();
-                SortTiles();
-                return;
+                    updateSurroundingTiles(lowestPossibilitiesTile[randomStartTile]);
+
+                    uncompletedTiles.Remove(lowestPossibilitiesTile[randomStartTile]);
+                    startTilesManager = lowestPossibilitiesTile[randomStartTile].GetComponent<PG_TileManager>();
+                    SortTiles();
+                    return;
+                }
+
+                if (connectedToStartTile.Count > 0)
+                {
+                    Debug.Log("Creating connected tile!");
+                    int randomTile = Random.Range(0, connectedToStartTile.Count);
+
+                    connectedToStartTile[randomTile].GetComponent<PG_TileManager>().SetTile();
+
+                    //neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().row));
+
+                    AddRange(GetNeighbours(connectedToStartTile[randomTile].GetComponent<PG_TileManager>().col, connectedToStartTile[randomTile].GetComponent<PG_TileManager>().row));
+
+                    neighbouringTiles.Remove(connectedToStartTile[randomTile]);
+
+                    updateSurroundingTiles(connectedToStartTile[randomTile]);
+
+                    uncompletedTiles.Remove(connectedToStartTile[randomTile]);
+                    SetConnectedToStart(connectedToStartTile[randomTile]);
+                    SortTiles();
+                }
+                else
+                {
+                    Debug.Log("Creating normal tile!");
+                    int randomTile = Random.Range(0, lowestPossibilitiesTile.Count);
+
+                    lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().SetTile();
+
+                    //neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().row));
+
+                    AddRange(GetNeighbours(lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().row));
+
+                    neighbouringTiles.Remove(lowestPossibilitiesTile[randomTile]);
+
+                    updateSurroundingTiles(lowestPossibilitiesTile[randomTile]);
+
+                    uncompletedTiles.Remove(lowestPossibilitiesTile[randomTile]);
+                    SetConnectedToStart(lowestPossibilitiesTile[randomTile]);
+                    SortTiles();
+                }
             }
-            Debug.Log("Creating normal tile!");
+            catch
+            {
 
-            int randomTile = Random.Range(0, lowestPossibilitiesTile.Count);
+            }
 
-            lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().SetTile();
 
-            //neighbouringTiles.AddRange(GetNeighbours(lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().row));
+        }
 
-            AddRange(GetNeighbours(lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().col, lowestPossibilitiesTile[randomTile].GetComponent<PG_TileManager>().row));
+    }
 
-            neighbouringTiles.Remove(lowestPossibilitiesTile[randomTile]);
+    public void SetConnectedToStart(GameObject tile)
+    {
 
-            updateSurroundingTiles(lowestPossibilitiesTile[randomTile]);
-
-            uncompletedTiles.Remove(lowestPossibilitiesTile[randomTile]);
-
-            SortTiles();
+        for (int i = 0; i < 4; i++)
+        {
+            TileTypes type = tile.GetComponent<PG_TileManager>().GetSideBasedOnRotation(i);
+            Debug.Log("I: " + i + " tile type: " + type);
+            if (type == TileTypes.Solid)
+            {
+                GameObject side = getNeighbourBasedOnSide(tile.GetComponent<PG_TileManager>().col, tile.GetComponent<PG_TileManager>().row, i);
+                side.GetComponent<PG_TileManager>().isConnectedToStart = true;
+            }
         }
 
     }
@@ -235,21 +284,49 @@ public class PG_AdvGenerator : MonoBehaviour
 
         foreach (GameObject neighbour in neighbouringTiles)
         {
-            if (lowestPossibilitiesTile.Count == 0)
+            if (neighbour.GetComponent<PG_TileManager>().isConnectedToStart)
             {
-                lowestPossibilitiesTile.Add(neighbour);
-                lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+                if (connectedToStartTile.Count == 0)
+                {
+                    lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+                    connectedToStartTile.Clear();
+                    connectedToStartTile.Add(neighbour);
+                    continue;
+                }
+
+                if (neighbour.GetComponent<PG_TileManager>().entropy == lowestValue)
+                {
+                    connectedToStartTile.Add(neighbour);
+                }
+                if (neighbour.GetComponent<PG_TileManager>().entropy < lowestValue)
+                {
+                    connectedToStartTile.Clear();
+                    connectedToStartTile.Add(neighbour);
+                    lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+                }
+
+
+                continue;
             }
-            if (neighbour.GetComponent<PG_TileManager>().entropy == lowestValue)
+            if (neighbour.GetComponent<PG_TileManager>().entropy != 0)
             {
-                lowestPossibilitiesTile.Add(neighbour);
+                if (lowestPossibilitiesTile.Count == 0)
+                {
+                    lowestPossibilitiesTile.Add(neighbour);
+                    lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+                }
+                if (neighbour.GetComponent<PG_TileManager>().entropy == lowestValue)
+                {
+                    lowestPossibilitiesTile.Add(neighbour);
+                }
+                if (neighbour.GetComponent<PG_TileManager>().entropy < lowestValue)
+                {
+                    lowestPossibilitiesTile.Clear();
+                    lowestPossibilitiesTile.Add(neighbour);
+                    lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+                }
             }
-            if (neighbour.GetComponent<PG_TileManager>().entropy < lowestValue)
-            {
-                lowestPossibilitiesTile.Clear();
-                lowestPossibilitiesTile.Add(neighbour);
-                lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
-            }
+
         }
         return;
 
@@ -300,6 +377,40 @@ public class PG_AdvGenerator : MonoBehaviour
 
 
         return neighbours;
+    }
+
+    public GameObject getNeighbourBasedOnSide(int col, int row, int side)
+    {
+        switch (side)
+        {
+            case 0:
+                if (row + 1 < rows)
+                {
+                    return generatedTiles[col * columns + (row + 1)];
+                }
+                return null;
+            case 1:
+                if (col + 1 < columns)
+                {
+                    return generatedTiles[(col + 1) * columns + row];
+                }
+                return null;
+            case 2:
+                if (row - 1 >= 0)
+                {
+                    return generatedTiles[col * columns + (row - 1)];
+                }
+                return null;
+            case 3:
+                if (col - 1 >= 0)
+                {
+                    return generatedTiles[(col - 1) * columns + row];
+                }
+                return null;
+            default:
+                Debug.LogWarning("Tiles do not have more than 4 sides, invalid side");
+                return null;
+        }
     }
 
     public List<TileTypes> GetTypesOfNeighbours(int col, int row)
