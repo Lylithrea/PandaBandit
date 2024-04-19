@@ -3,15 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Windows.Speech;
 
 [ExecuteInEditMode]
 public class PG_AdvGenerator : MonoBehaviour
 {
 
     public List<PG_AdvTile> allTiles = new List<PG_AdvTile>();
+    [ReadOnly] public int totalRarity = 0;
+    public List<PG_AdvTile> startTiles = new List<PG_AdvTile>();
+    [ReadOnly] public int totalStartRarity = 0;
+    public List<PG_AdvTile> endTiles = new List<PG_AdvTile>();
+    [ReadOnly] public int totalEndRarity = 0;
+    public List<PG_AdvTile> backupTiles = new List<PG_AdvTile>();
+    [Space]
     public GameObject baseTile;
-
+    public bool newGeneration = false;
     public int columns = 0, rows = 0;
 
 
@@ -22,12 +31,13 @@ public class PG_AdvGenerator : MonoBehaviour
     public List<GameObject> connectedToStartTile = new List<GameObject>();
     public List<GameObject> uncompletedTiles = new List<GameObject>();
     public List<GameObject> neighbouringTiles = new List<GameObject>();
+    [Space]
+    public Dictionary<Vector3, GameObject> newGeneratedTiles = new Dictionary<Vector3, GameObject>();
+    public List<GameObject> uncompletedNewTiles = new List<GameObject> ();
+    public List<GameObject> lowestEntropyTiles = new List<GameObject> ();
 
     public static PG_AdvGenerator instance;
 
-    public List<PG_AdvTile> startTiles = new List<PG_AdvTile>();
-    public List<PG_AdvTile> endTiles = new List<PG_AdvTile>();
-    public List<PG_AdvTile> backupTiles = new List<PG_AdvTile>();
     public int minLength = 4;
     public int maxLength = 6;
     [Foldout("Start Tile Settings")] public int minXPosition = 0;
@@ -49,8 +59,44 @@ public class PG_AdvGenerator : MonoBehaviour
     public void OnValidate()
     {
         Awake();
+        CalculateTotalRarity();
     }
 
+    public void CalculateTotalRarity()
+    {
+        int startRarity = 0;
+        foreach (PG_AdvTile tile in startTiles)
+        {
+            startRarity += tile.rarity;
+        }
+        totalStartRarity = startRarity;
+        foreach (PG_AdvTile tile in startTiles)
+        {
+            tile.SetReadOnlys(totalStartRarity);
+        }
+
+        int endRarity = 0;
+        foreach (PG_AdvTile tile in endTiles)
+        {
+            endRarity += tile.rarity;
+        }
+        totalEndRarity = endRarity;
+        foreach (PG_AdvTile tile in endTiles)
+        {
+            tile.SetReadOnlys(totalEndRarity);
+        }
+
+        int totalAllRarity = 0;
+        foreach (PG_AdvTile tile in allTiles)
+        {
+            totalAllRarity += tile.rarity;
+        }
+        totalRarity = totalAllRarity;
+        foreach (PG_AdvTile tile in allTiles)
+        {
+            tile.SetReadOnlys(totalAllRarity);
+        }
+    }
 
 
     [Button]
@@ -60,18 +106,35 @@ public class PG_AdvGenerator : MonoBehaviour
         {
             DestroyImmediate(tile);
         }
+        foreach (KeyValuePair<Vector3, GameObject> tile in newGeneratedTiles)
+        {
+            DestroyImmediate(tile.Value);
+        }
+        foreach (Transform child in this.transform)
+        {
+            DestroyImmediate(child.gameObject);
+        }
         generatedTiles.Clear();
         uncompletedTiles.Clear();
         lowestPossibilitiesTile.Clear();
         startTilesManager = null;
         endTilesManagers.Clear();
         neighbouringTiles.Clear();
+
+        newGeneratedTiles.Clear();
+        uncompletedNewTiles.Clear();
+        lowestEntropyTiles.Clear();
     }
 
     [Button]
     public void Generate()
     {
         RemoveTiles();
+
+        if (newGeneration)
+        {
+            return;
+        }
 
         for (int i = 0; i < columns; i++)
         {
@@ -92,6 +155,7 @@ public class PG_AdvGenerator : MonoBehaviour
         SortTiles();
     }
 
+
     private void SetupTile(GameObject tile, int col, int row)
     {
         PG_TileManager manager = tile.GetComponent<PG_TileManager>();
@@ -109,14 +173,118 @@ public class PG_AdvGenerator : MonoBehaviour
     }
 
 
+    private void SetupNextGenTile(GameObject tile, int col, int row)
+    {
+        PG_TileManager manager = tile.GetComponent<PG_TileManager>();
+        if (manager == null) return;
+
+        manager.col = col;
+        manager.row = row;
+
+        foreach (PG_AdvTile tile2 in allTiles)
+        {
+            tile.GetComponent<PG_TileManager>().possibleTiles.Add(tile2);
+        }
+
+        tile.transform.position = new Vector3(col, 0, row);
+        tile.GetComponent<PG_TileManager>().UpdateTile();
+        newGeneratedTiles.Add(new Vector3(col, 0, row), tile);
+    }
+
+    private List<GameObject> GenerateNeighbouringTiles(GameObject tile)
+    {
+        List<GameObject> neighbours = new List<GameObject>();
+        PG_TileManager baseManager = tile.GetComponent<PG_TileManager> ();
+
+        neighbours.Add(updateOrCreateTile(baseManager.col, baseManager.row + 1));
+        neighbours.Add(updateOrCreateTile(baseManager.col + 1, baseManager.row));
+        neighbours.Add(updateOrCreateTile(baseManager.col, baseManager.row - 1));
+        neighbours.Add(updateOrCreateTile(baseManager.col - 1, baseManager.row ));
+        return neighbours;
+    }
+
+    private GameObject updateOrCreateTile(int col, int row)
+    {
+        if (newGeneratedTiles.ContainsKey(new Vector3(col, 0, row)))
+        {
+            newGeneratedTiles[new Vector3(col, 0, row)].GetComponent<PG_TileManager>().UpdateTile();
+            return newGeneratedTiles[new Vector3(col, 0, row)];
+        }
+        else
+        {
+            GameObject tile = Instantiate(baseTile, this.transform);
+            SetupNextGenTile(tile, col, row);
+            uncompletedNewTiles.Add(tile);
+            return tile;
+        }
+    }
+
+    private void NewGenNextStep()
+    {
+        //newGeneratedTiles contains all generated tiles, so if its 0, none has spawned yet.
+        if (newGeneratedTiles.Count <= 0)
+        {
+            //generate start tile; 
+            //also spawn 4 surrounding tiles, so the entropy can be generated for those.
+            Debug.Log("Creating start tile!");
+            GameObject newTile = Instantiate(baseTile, this.transform);
+            SetupNextGenTile(newTile, 0, 0);
+
+            Debug.Log("child : " + newTile.transform.childCount);
+
+            newTile.GetComponent<PG_TileManager>().SetStartTile(startTiles);
+            newTile.GetComponent<PG_TileManager>().isConnectedToStart = true;
+            newTile.GetComponent<PG_TileManager>().isStartTile = true;
+            newTile.GetComponent<PG_TileManager>().distanceFromStart = 0;
+
+
+            Debug.Log("child 2: " + newTile.transform.childCount);
+
+            //spawn the 4 neighbouring tiles
+            List<GameObject> neighbours = GenerateNeighbouringTiles(newTile);
+
+            Debug.Log("child 3: " + newTile.transform.childCount);
+            List<GameObject> result = SetConnectedToStart(newTile);
+            newTile.GetComponent<PG_TileManager>().neighbours = result;
+            Debug.Log("child 4: " + newTile.transform.childCount);
+        }
+        else
+        {
+            Debug.Log("Creating new tile!");
+
+            int randomTile = Random.Range(0, lowestEntropyTiles.Count);
+
+            lowestEntropyTiles[randomTile].GetComponent<PG_TileManager>().SetTile();
+
+
+            List<GameObject> neighbours = GenerateNeighbouringTiles(lowestEntropyTiles[randomTile]);
+            List<GameObject> result = SetConnectedToStart(lowestEntropyTiles[randomTile]);
+            lowestEntropyTiles[randomTile].GetComponent<PG_TileManager>().neighbours = result;
+            uncompletedNewTiles.Remove(lowestEntropyTiles[randomTile]);
+
+
+        }
+        //if we do already have generated tiles, we look at the lowest entropy.
+        //Generate the lowest entropy tile, and then generate the 4 around it if they havent been generated yet, if they have, update those tiles instead.
+
+        SortNewTiles();
+    }
+
 
     public int steps = 1;
 
     [Button]
     public void NextStep()
     {
+
         for (int i = 0; i < steps; i++)
         {
+            if (newGeneration)
+            {
+                NewGenNextStep();
+                continue;
+            }
+
             try
             {
                 if (generatedTiles.Count == 0) return;
@@ -193,9 +361,12 @@ public class PG_AdvGenerator : MonoBehaviour
 
     }
 
-    public void SetConnectedToStart(GameObject tile)
-    {
+    public int maxDistance = 0;
 
+    public List<GameObject> SetConnectedToStart(GameObject tile)
+    {
+        List<GameObject> result = new List<GameObject>();
+        Debug.Log("Setting connected! Neighbouring tiles of: " + tile + " with distance: " + tile.GetComponent<PG_TileManager>().distanceFromStart);
         for (int i = 0; i < 4; i++)
         {
             TileTypes type = tile.GetComponent<PG_TileManager>().GetSideBasedOnRotation(i);
@@ -203,9 +374,20 @@ public class PG_AdvGenerator : MonoBehaviour
             if (type == TileTypes.Solid)
             {
                 GameObject side = getNeighbourBasedOnSide(tile.GetComponent<PG_TileManager>().col, tile.GetComponent<PG_TileManager>().row, i);
+                result.Add(side);
+                if (side.GetComponent<PG_TileManager>().isStartTile) continue;
                 side.GetComponent<PG_TileManager>().isConnectedToStart = true;
+
+                //if (side.GetComponent<PG_TileManager>().distanceFromStart != 0 && side.GetComponent<PG_TileManager>().distanceFromStart < tile.GetComponent<PG_TileManager>().distanceFromStart + 1) continue;
+                //side.GetComponent<PG_TileManager>().distanceFromStart = tile.GetComponent<PG_TileManager>().distanceFromStart + 1;
+                side.GetComponent<PG_TileManager>().updateDistanceFromStart(tile.GetComponent<PG_TileManager>().distanceFromStart + 1);
+                if (maxDistance < side.GetComponent<PG_TileManager>().distanceFromStart)
+                {
+                    maxDistance = side.GetComponent<PG_TileManager>().distanceFromStart;
+                }
             }
         }
+        return result;
 
     }
 
@@ -264,6 +446,62 @@ public class PG_AdvGenerator : MonoBehaviour
         }
 
     }
+
+
+
+    public void SortNewTiles()
+    {
+        lowestEntropyTiles.Clear();
+        lowestValue = 100;
+
+        foreach (GameObject neighbour in uncompletedNewTiles)
+        {
+            if (neighbour.GetComponent<PG_TileManager>().isConnectedToStart)
+            {
+                if (lowestEntropyTiles.Count == 0)
+                {
+                    lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+                    lowestEntropyTiles.Clear();
+                    lowestEntropyTiles.Add(neighbour);
+                    continue;
+                }
+
+                if (neighbour.GetComponent<PG_TileManager>().entropy == lowestValue)
+                {
+                    lowestEntropyTiles.Add(neighbour);
+                }
+                if (neighbour.GetComponent<PG_TileManager>().entropy < lowestValue)
+                {
+                    lowestEntropyTiles.Clear();
+                    lowestEntropyTiles.Add(neighbour);
+                    lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+                }
+
+
+                continue;
+            }
+/*            if (neighbour.GetComponent<PG_TileManager>().entropy != 0)
+            {
+                if (lowestEntropyTiles.Count == 0)
+                {
+                    lowestEntropyTiles.Add(neighbour);
+                    lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+                }
+                if (neighbour.GetComponent<PG_TileManager>().entropy == lowestValue)
+                {
+                    lowestPossibilitiesTile.Add(neighbour);
+                }
+                if (neighbour.GetComponent<PG_TileManager>().entropy < lowestValue)
+                {
+                    lowestPossibilitiesTile.Clear();
+                    lowestPossibilitiesTile.Add(neighbour);
+                    lowestValue = neighbour.GetComponent<PG_TileManager>().entropy;
+                }
+            }*/
+
+        }
+    }
+
 
 
     public float lowestValue = 100;
@@ -381,6 +619,10 @@ public class PG_AdvGenerator : MonoBehaviour
 
     public GameObject getNeighbourBasedOnSide(int col, int row, int side)
     {
+        if (newGeneration)
+        {
+            return getNewNeighbourBasedOnSide(col, row, side);
+        }
         switch (side)
         {
             case 0:
@@ -413,10 +655,89 @@ public class PG_AdvGenerator : MonoBehaviour
         }
     }
 
+    public GameObject getNewNeighbourBasedOnSide(int col, int row, int side)
+    {
+        switch (side)
+        {
+            case 0:
+                if (newGeneratedTiles.ContainsKey(new Vector3(col, 0, row + 1)))
+                {
+                    return newGeneratedTiles[new Vector3(col, 0, row + 1)];
+                }
+                return null;
+            case 1:
+                if (newGeneratedTiles.ContainsKey(new Vector3(col + 1, 0, row)))
+                {
+                    return newGeneratedTiles[new Vector3(col + 1, 0, row)];
+                }
+                return null;
+            case 2:
+                if (newGeneratedTiles.ContainsKey(new Vector3(col, 0, row - 1)))
+                {
+                    return newGeneratedTiles[new Vector3(col, 0, row - 1)];
+                }
+                return null;
+            case 3:
+                if (newGeneratedTiles.ContainsKey(new Vector3(col - 1, 0, row)))
+                {
+                    return newGeneratedTiles[new Vector3(col - 1, 0, row)];
+                }
+                return null;
+            default:
+                Debug.LogWarning("Tiles do not have more than 4 sides, invalid side");
+                return null;
+        }
+    }
+
+
+    public List<TileTypes> getNewTypes(int col, int row)
+    {
+        List<TileTypes> neighbours = new List<TileTypes>();
+
+        if (newGeneratedTiles.ContainsKey(new Vector3(col, 0, row + 1)))
+        {
+            neighbours.Add(newGeneratedTiles[new Vector3(col, 0, row + 1)].GetComponent<PG_TileManager>().GetSide(col, row));
+        }
+        else
+        {
+            neighbours.Add(TileTypes.None);
+        }
+        if (newGeneratedTiles.ContainsKey(new Vector3(col + 1, 0, row)))
+        {
+            neighbours.Add(newGeneratedTiles[new Vector3(col + 1, 0, row)].GetComponent<PG_TileManager>().GetSide(col, row));
+        }
+        else
+        {
+            neighbours.Add(TileTypes.None);
+        }
+        if (newGeneratedTiles.ContainsKey(new Vector3(col, 0, row - 1)))
+        {
+            neighbours.Add(newGeneratedTiles[new Vector3(col, 0, row - 1)].GetComponent<PG_TileManager>().GetSide(col, row));
+        }
+        else
+        {
+            neighbours.Add(TileTypes.None);
+        }
+        if (newGeneratedTiles.ContainsKey(new Vector3(col - 1, 0, row)))
+        {
+            neighbours.Add(newGeneratedTiles[new Vector3(col -1 , 0, row)].GetComponent<PG_TileManager>().GetSide(col, row));
+        }
+        else
+        {
+            neighbours.Add(TileTypes.None);
+        }
+
+        return neighbours;
+    }
+
     public List<TileTypes> GetTypesOfNeighbours(int col, int row)
     {
         List<TileTypes> neighbours = new List<TileTypes>();
 
+        if (newGeneration)
+        {
+            return getNewTypes(col, row);
+        }
 
         if (row + 1 < rows)
         {

@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 751e78e5d2c0047458af82d013090b53, type: 3}
   m_Name: EmptyTile 9
   m_EditorClassIdentifier: 
-  visualObject: {fileID: 0}
+  totalRarity: 19
+  percentage: 10.53
+  rarity: 2
   tile: {fileID: 7914226485116586518, guid: 545b4efda64997b459a1c537d62c9a63, type: 3}
   sideA: 4
   sideB: 4

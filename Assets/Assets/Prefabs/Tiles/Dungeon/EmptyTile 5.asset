@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 751e78e5d2c0047458af82d013090b53, type: 3}
   m_Name: EmptyTile 5
   m_EditorClassIdentifier: 
-  tileName: Cross Room
-  visualObject: {fileID: 0}
+  totalRarity: 19
+  percentage: 5.26
+  rarity: 1
   tile: {fileID: 7914226485116586518, guid: 92bbd684e0f42a349ab91695e242d1ef, type: 3}
   sideA: 4
   sideB: 4

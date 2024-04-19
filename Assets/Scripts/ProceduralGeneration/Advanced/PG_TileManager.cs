@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEditor.Build.Content;
 using UnityEngine;
@@ -22,18 +23,75 @@ public class PG_TileManager : MonoBehaviour
     public int rotation = 0;
     public PG_AdvTile tile = null;
     public bool isConnectedToStart = false;
+    public bool isStartTile = false;
 
     public List<PG_AdvTile> possibleTiles = new List<PG_AdvTile>();
     public Dictionary<PG_AdvTile, int> possibleRotTiles = new Dictionary<PG_AdvTile, int>();
     public Dictionary<int, PG_AdvTile> randomTiles = new Dictionary<int, PG_AdvTile>();
 
     public List<TileRotations> tileRotations = new List<TileRotations>();
+    public int distanceFromStart = 0;
+    public List<GameObject> neighbours = new List<GameObject>();
 
     public TileTypes sideA;
     public TileTypes sideB;
     public TileTypes sideC;
     public TileTypes sideD;
+    
 
+
+    public void updateDebugMaterial(int totalDistance)
+    {
+        if (isStartTile) return;
+        foreach (Transform child in this.gameObject.transform)
+        {
+            child.GetComponentInChildren<MeshRenderer>().material.SetColor("_BaseColor", new Color(distanceFromStart / totalDistance, 0, 0));
+        }
+    }
+
+    public void updateDistanceFromStart(int newDistance)
+    {
+
+        if (distanceFromStart == 0)
+        {
+            Debug.Log("Errors1");
+            distanceFromStart = newDistance;
+        }
+        else if (distanceFromStart > newDistance)
+        {
+            Debug.Log("Errors2");
+            distanceFromStart = newDistance;
+            foreach (GameObject neighbour in neighbours)
+            {
+                neighbour.GetComponent<PG_TileManager>().updateDistanceFromStart(distanceFromStart + 1);
+            }
+        }
+        else
+        {
+
+            if (newDistance - distanceFromStart >= 2)
+            {
+                Debug.Log("Errors3");
+                foreach (GameObject neighbour in neighbours)
+                {
+                    neighbour.GetComponent<PG_TileManager>().updateDistanceFromStart(distanceFromStart + 1);
+                }
+            }
+        }
+
+        Debug.Log("Children: " + this.gameObject.transform.childCount);
+        if (this.gameObject.transform.childCount > 0)
+        {
+            Debug.Log("Children 2: " + this.transform.GetChild(0).childCount);
+            TextMeshPro text = this.transform.GetChild(0).GetComponentInChildren<TextMeshPro>();
+            text.text = distanceFromStart.ToString();
+            Debug.Log("Text: " + text);
+        }
+
+
+
+
+    }
 
     //if we arent a tile yet
     //calculate based on surrounding tiles how much entropy we have
@@ -59,6 +117,11 @@ public class PG_TileManager : MonoBehaviour
 
     public virtual void UpdatePossibleTiles(List<TileTypes> tileTypes)
     {
+        if (tileTypes.Count <= 0)
+        {
+            SetAllPossibleTiles();
+            return;
+        }
         for (int i = 0; i < possibleTiles.Count; i++)
         {
             //find all possible starting points
@@ -129,9 +192,21 @@ public class PG_TileManager : MonoBehaviour
         }
     }
 
+    public void SetAllPossibleTiles()
+    {
+        for(int i = 0; i < possibleTiles.Count; i++)
+        {
+            tileRotations.Add(new TileRotations(possibleTiles[i], 0));
+            tileRotations.Add(new TileRotations(possibleTiles[i], 1));
+            tileRotations.Add(new TileRotations(possibleTiles[i], 2));
+            tileRotations.Add(new TileRotations(possibleTiles[i], 3));
+        }
+    }
+
     public List<TileTypes> GetNeightbouringTileTypes()
     {
         List<TileTypes> tileTypes = PG_AdvGenerator.instance.GetTypesOfNeighbours(col, row);
+        Debug.Log("Tiletype count: " + tileTypes.Count);
         int index = 0;
         foreach (TileTypes tileType in tileTypes)
         {
@@ -209,12 +284,12 @@ public class PG_TileManager : MonoBehaviour
     public void SetTile()
     {
         entropy = 0;
-        int randomTile = Random.Range(0, tileRotations.Count);
+        //int randomTile = Random.Range(0, tileRotations.Count);
+        TileRotations tile = GetTileBasedOnRarity();
 
-        //PG_AdvTile newTile = randomTiles[randomTile];
-        var newTile = tileRotations[randomTile].tile;
+        var newTile = tile.tile;
         this.tile = newTile;
-        this.rotation = tileRotations[randomTile].rotation;
+        this.rotation = tile.rotation;
 
         foreach (Transform child in this.transform)
         {
@@ -222,8 +297,35 @@ public class PG_TileManager : MonoBehaviour
         }
         GameObject tileObj = Instantiate(newTile.GetTile(), this.transform);
 
-        tileObj.transform.Rotate(new Vector3(0, tileRotations[randomTile].rotation * -90, 0));
+        tileObj.transform.Rotate(new Vector3(0, tile.rotation * -90, 0));
     }
+
+
+    public TileRotations GetTileBasedOnRarity()
+    {
+        int totalRarity = 0;
+        foreach (TileRotations tile in tileRotations)
+        {
+            totalRarity += tile.tile.rarity;
+        }
+
+        int randomRarity = Random.Range(0, totalRarity);
+        int currentRarity = 0;
+        foreach (TileRotations tile in tileRotations)
+        {
+            currentRarity += tile.tile.rarity;
+            if (randomRarity <= currentRarity)
+            {
+                return tile;
+            }
+        }
+
+        return null;
+
+    }
+
+
+
 
     public void SetStartTile(List<PG_AdvTile> startTiles)
     {

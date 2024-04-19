@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 751e78e5d2c0047458af82d013090b53, type: 3}
   m_Name: EmptyTile 1
   m_EditorClassIdentifier: 
-  tileName: Straight Hallway
-  visualObject: {fileID: 0}
+  totalRarity: 19
+  percentage: 21.05
+  rarity: 4
   tile: {fileID: 7914226485116586518, guid: 9a5aae24682bfac45ad4e4851cab71f1, type: 3}
   sideA: 4
   sideB: 5

@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 751e78e5d2c0047458af82d013090b53, type: 3}
   m_Name: EmptyTile 6
   m_EditorClassIdentifier: 
-  tileName: Straight Room
-  visualObject: {fileID: 0}
+  totalRarity: 19
+  percentage: 21.05
+  rarity: 4
   tile: {fileID: 7914226485116586518, guid: 5934f3a9851532943a9350adf9c6e1a5, type: 3}
   sideA: 5
   sideB: 4
