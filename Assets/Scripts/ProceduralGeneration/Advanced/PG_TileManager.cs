@@ -9,10 +9,12 @@ public class TileRotations
 {
     public PG_AdvTile tile;
     public int rotation;
-    public TileRotations(PG_AdvTile tile, int rotation)
+    public int connectionSides = 0;
+    public TileRotations(PG_AdvTile tile, int rotation, int connections = 0)
     {
         this.tile = tile;
         this.rotation = rotation;
+        this.connectionSides = connections;
     }
 }
 
@@ -54,42 +56,22 @@ public class PG_TileManager : MonoBehaviour
 
         if (distanceFromStart == 0)
         {
-            Debug.Log("Errors1");
             distanceFromStart = newDistance;
         }
         else if (distanceFromStart > newDistance)
         {
-            Debug.Log("Errors2");
             distanceFromStart = newDistance;
             foreach (GameObject neighbour in neighbours)
             {
                 neighbour.GetComponent<PG_TileManager>().updateDistanceFromStart(distanceFromStart + 1);
             }
         }
-        else
-        {
 
-            if (newDistance - distanceFromStart >= 2)
-            {
-                Debug.Log("Errors3");
-                foreach (GameObject neighbour in neighbours)
-                {
-                    neighbour.GetComponent<PG_TileManager>().updateDistanceFromStart(distanceFromStart + 1);
-                }
-            }
-        }
-
-        Debug.Log("Children: " + this.gameObject.transform.childCount);
         if (this.gameObject.transform.childCount > 0)
         {
-            Debug.Log("Children 2: " + this.transform.GetChild(0).childCount);
             TextMeshPro text = this.transform.GetChild(0).GetComponentInChildren<TextMeshPro>();
             text.text = distanceFromStart.ToString();
-            Debug.Log("Text: " + text);
         }
-
-
-
 
     }
 
@@ -186,7 +168,16 @@ public class PG_TileManager : MonoBehaviour
                 if (combo == tileTypes.Count)
                 {
                     int tileRot = startingPoints[s];
-                    tileRotations.Add(new TileRotations(possibleTiles[i], tileRot));
+                    int connections = 0;
+                    for(int k = 0; k < 4; k++)
+                    {
+                        TileTypes type = possibleTiles[i].GetSide(k);
+                        if (type == TileTypes.Solid)
+                        {
+                            connections++;
+                        }
+                    }
+                    tileRotations.Add(new TileRotations(possibleTiles[i], tileRot, connections));
                 }
             }
         }
@@ -300,20 +291,43 @@ public class PG_TileManager : MonoBehaviour
         tileObj.transform.Rotate(new Vector3(0, tile.rotation * -90, 0));
     }
 
+    public float getDistanceInfluence(TileRotations tile)
+    {
+        float lengthMultiplier = (distanceFromStart / PG_AdvGenerator.instance.maxLength);
+
+        switch (tile.connectionSides)
+        {
+            case 0:
+                return 0;
+            case 1:
+                return PG_AdvGenerator.instance.minConnectionCurve.Evaluate(lengthMultiplier);
+            case 2:
+                return PG_AdvGenerator.instance.medConnectionCurve.Evaluate(lengthMultiplier);
+            case 3:
+                return PG_AdvGenerator.instance.maxConnectionCurve.Evaluate(lengthMultiplier);
+            case 4:
+                return PG_AdvGenerator.instance.maxmaxConnectionCurve.Evaluate(lengthMultiplier);
+            default:
+                return 0;
+        }
+    }
 
     public TileRotations GetTileBasedOnRarity()
     {
-        int totalRarity = 0;
+        float totalRarity = 0;
+
         foreach (TileRotations tile in tileRotations)
         {
-            totalRarity += tile.tile.rarity;
+            float distanceInfluence = getDistanceInfluence(tile);
+            totalRarity += tile.tile.rarity * distanceInfluence;
         }
 
-        int randomRarity = Random.Range(0, totalRarity);
-        int currentRarity = 0;
+        float randomRarity = Random.Range(0, totalRarity);
+        float currentRarity = 0;
         foreach (TileRotations tile in tileRotations)
         {
-            currentRarity += tile.tile.rarity;
+            float distanceInfluence = getDistanceInfluence(tile);
+            currentRarity += tile.tile.rarity * distanceInfluence;
             if (randomRarity <= currentRarity)
             {
                 return tile;
@@ -323,7 +337,6 @@ public class PG_TileManager : MonoBehaviour
         return null;
 
     }
-
 
 
 
