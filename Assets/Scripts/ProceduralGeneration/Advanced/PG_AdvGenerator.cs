@@ -49,6 +49,12 @@ public class PG_AdvGenerator : MonoBehaviour
     [Foldout("Start Tile Settings")] public int minYPosition = 0;
     [Foldout("Start Tile Settings")] public int maxYPosition = 1;
 
+    [Foldout("End Tile Settings")] public int minAmount = 1;
+    [Foldout("End Tile Settings")] public int maxAmount = 10;
+    [Foldout("End Tile Settings")] public int minDistance = 5;
+
+    public int currentEndTiles = 0;
+
     private PG_TileManager startTilesManager;
     private List<PG_TileManager> endTilesManagers = new List<PG_TileManager>();
 

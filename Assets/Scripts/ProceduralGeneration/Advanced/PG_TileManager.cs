@@ -330,6 +330,12 @@ public class PG_TileManager : MonoBehaviour
             currentRarity += tile.tile.rarity * distanceInfluence;
             if (randomRarity <= currentRarity)
             {
+
+                if (tile.connectionSides == 1)
+                {
+                    TileRotations endTile = EndTileHandler();
+                    if (endTile != null) return endTile;
+                }
                 return tile;
             }
         }
@@ -338,6 +344,24 @@ public class PG_TileManager : MonoBehaviour
 
     }
 
+    public TileRotations EndTileHandler()
+    {
+
+        if (PG_AdvGenerator.instance.minDistance < distanceFromStart) return null;
+
+        if (PG_AdvGenerator.instance.currentEndTiles == 0)
+        {
+            int randomTile = Random.Range(0, PG_AdvGenerator.instance.endTiles.Count);
+            //return PG_AdvGenerator.instance.endTiles[randomTile];
+        }
+
+        if (PG_AdvGenerator.instance.currentEndTiles < PG_AdvGenerator.instance.maxAmount)
+        {
+
+        }
+
+        return null;
+    }
 
 
     public void SetStartTile(List<PG_AdvTile> startTiles)
